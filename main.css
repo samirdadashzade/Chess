@@ -24,3 +24,7 @@ td {
 .active {
 	background-color: yellow;;
 }
+
+.possibleMove {
+	background-color: red;
+}
