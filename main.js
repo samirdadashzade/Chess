@@ -47,39 +47,73 @@ function createSolders() {
 		name: 'bishop',
 		black: '&#9821',
 		white: '&#9815',
-		checkFields: function() {
-			$('td').click(function(event){
-				var target = $(event.target).parent();
-				var fieldData = target.attr('id').split('');
-				var row = Number(fieldData[0]);
-				var colum = colums.indexOf(fieldData[1])+1;
-				var possibleMoves = [];
-				for (var i = 1; i <= 3; i++ ) {
-					if (colums[(colum - i) - 1] === undefined) {
-						var leftField = null;
-					} else {
-						var leftField = '#' + (row - i) + colums[(colum - i) - 1];
-						possibleMoves.push(leftField);
-					}
-
-					if (colums[(colum + i) - 1] === undefined) {
-						var rightField = null;
-					} else {
-						var rightField = '#' + (row - i) + colums[(colum + i) - 1];
-						possibleMoves.push(rightField);
-					}
+		checkFields: function(event) {
+			var target = $(event.target).parent();
+			var fieldData = target.attr('id').split('');
+			var row = Number(fieldData[0]);
+			var colum = colums.indexOf(fieldData[1])+1;
+			var possibleMoves = [];
+			for (var i = 1; i <= 3; i++ ) {
+				if (colums[(colum - i) - 1] === undefined) {
+					var leftField = null;
+				} else {
+					var leftField = '#' + (row - i) + colums[(colum - i) - 1];
+					possibleMoves.push(leftField);
 				}
-				return possibleMoves;
-			});
+
+				if (colums[(colum + i) - 1] === undefined) {
+					var rightField = null;
+				} else {
+					var rightField = '#' + (row - i) + colums[(colum + i) - 1];
+					possibleMoves.push(rightField);
+				}
+			}
+			// return possibleMoves;
+			for (var i = 0; i < possibleMoves.length; i++) {
+				$(possibleMoves[i]).addClass('possibleMove');
+			}
 		}
 	};
 
 	queen = {
 		name: 'queen',
 		black: '&#9818',
-		white: '&#9812'
+		white: '&#9812',
 		// move: function() {}
+		checkFields: function(event) {
+			var target = $(event.target).parent();
+			var fieldData = target.attr('id').split('');
+			var row = Number(fieldData[0]);
+			var colum = colums.indexOf(fieldData[1]);
+			var possibleMoves = [];
+			var totalRows=$.grep(rows,function(item){
+				return item!=row;
+			});
+			var totalCols=$.grep(colums,function(item,index){
+				return index!=colum;
+			});
+			
+			totalRows.forEach(function(item,index){
+				if(colum!=-1){
+					// Queen xMoves
+					if(colums[colum-(Math.abs(row-item))]!==undefined){
+						var cell='#'+item+colums[colum-(Math.abs(row-item))];
+						possibleMoves.push(cell);
+					}
+					if(colums[colum+(Math.abs(row-item))]!==undefined){
+						var cell='#'+item+colums[colum+(Math.abs(row-item))];
+						possibleMoves.push(cell);
+					}
+					// Queen plus moves
+					possibleMoves.push('#'+item+colums[colum]);
+					possibleMoves.push('#'+row+totalCols[index]);
+				}
+			});
 
+			for (var i = 0; i < possibleMoves.length; i++) {
+				$(possibleMoves[i]).addClass('possibleMove');
+			}
+		}
 	};
 
 	king = {
@@ -133,14 +167,14 @@ function selectSolder() {
 
 	activeCounter = 0;
 	
-	$('td').click(function(){
-
+	$('td').click(function(event){
+		$('td').removeClass('possibleMove');
 		if ($(this).length > 0 && $(this).attr('data') !== 'active' && activeCounter === 0) {
 			$(this).attr('data','active');
 			$(this).addClass('active');
 			activeCounter = 1;
 			var  figure = window[$(this).children().attr('name')];
-			// figure.checkFields()
+			console.log(figure.checkFields(event));
 		} else if ($(this).attr('data') === 'active') {
 			$(this).removeAttr('data','active');
 			$(this).removeClass('active');
@@ -180,6 +214,9 @@ function move() {
 //	console.log(possibleMoves);
 // }
 // showMoves();
+
+
+
 
 $(document).ready(function(){
 
