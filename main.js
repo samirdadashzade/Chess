@@ -34,8 +34,28 @@ function createSolders() {
 	rook = {
 		name: 'rook',
 		black: '&#9820',
-		white: '&#9814'
-		// move: function() {}
+		white: '&#9814',
+		checkFields: function(event) {
+			var target = $(event.target);
+			var fieldData = target.attr('id').split('');
+			var row = Number(fieldData[0]);
+			var colum = colums.indexOf(fieldData[1]);
+			var possibleMoves = [];
+			var totalRows=$.grep(rows,function(item){
+				return item!=row;
+			});
+			var totalCols=$.grep(colums,function(item,index){
+				return index!=colum;
+			});
+			
+			totalRows.forEach(function(item,index){
+				if(colum!=-1){
+					possibleMoves.push('#'+item+colums[colum]);
+					possibleMoves.push('#'+row+totalCols[index]);
+				}
+			});
+			return possibleMoves;
+		}
 	};
 	knight = {
 		name: 'knight',
@@ -47,39 +67,67 @@ function createSolders() {
 		name: 'bishop',
 		black: '&#9821',
 		white: '&#9815',
-		checkFields: function(x) {
-			var target = $(x.target).parent();
+		checkFields: function(event) {
+			var target = $(event.target);
 			var fieldData = target.attr('id').split('');
 			var row = Number(fieldData[0]);
-			var colum = colums.indexOf(fieldData[1])+1;
+			var colum = colums.indexOf(fieldData[1]);
 			var possibleMoves = [];
-			for (var i = 1; i <= 3; i++ ) {
-				if (colums[(colum - i) - 1] === undefined) {
-					var leftField = null;
-				} else {
-					var leftField = '#' + (row - i) + colums[(colum - i) - 1];
-					possibleMoves.push(leftField);
+			var totalRows=$.grep(rows,function(item){
+			   	return item!=row;
+			});			
+			totalRows.forEach(function(item,index){
+				if(colum!=-1){
+					if(colums[colum-(Math.abs(row-item))]!==undefined){
+						var cell='#'+item+colums[colum-(Math.abs(row-item))];
+						possibleMoves.push(cell);
+					}
+					if(colums[colum+(Math.abs(row-item))]!==undefined){
+						var cell='#'+item+colums[colum+(Math.abs(row-item))];
+						possibleMoves.push(cell);
+					}
 				}
-
-				if (colums[(colum + i) - 1] === undefined) {
-					var rightField = null;
-				} else {
-					var rightField = '#' + (row - i) + colums[(colum + i) - 1];
-					possibleMoves.push(rightField);
-				}
-			}
-			for (var i = 0; i < possibleMoves.length; i++) {
-				$(possibleMoves[i]).addClass('possibleMove');
-			}
+			});
+			return possibleMoves;
 		}
 	};
 
 	queen = {
 		name: 'queen',
 		black: '&#9818',
-		white: '&#9812'
+		white: '&#9812',
 		// move: function() {}
-
+		checkFields: function(event) {
+			var target = $(event.target);
+			var fieldData = target.attr('id').split('');
+			var row = Number(fieldData[0]);
+			var colum = colums.indexOf(fieldData[1]);
+			var possibleMoves = [];
+			var totalRows=$.grep(rows,function(item){
+				return item!=row;
+			});
+			var totalCols=$.grep(colums,function(item,index){
+				return index!=colum;
+			});
+			
+			totalRows.forEach(function(item,index){
+				if(colum!=-1){
+					// Queen xMoves
+					if(colums[colum-(Math.abs(row-item))]!==undefined){
+						var cell='#'+item+colums[colum-(Math.abs(row-item))];
+						possibleMoves.push(cell);
+					}
+					if(colums[colum+(Math.abs(row-item))]!==undefined){
+						var cell='#'+item+colums[colum+(Math.abs(row-item))];
+						possibleMoves.push(cell);
+					}
+					// Queen plus moves
+					possibleMoves.push('#'+item+colums[colum]);
+					possibleMoves.push('#'+row+totalCols[index]);
+				}
+			});
+			return possibleMoves;
+		}
 	};
 
 	king = {
@@ -129,24 +177,26 @@ function createSolders() {
 
 function selectSolder() {
 
-	activeCounter = 0;
-	
-	$('td').click(function(event){
-
-		if ($(this).length > 0 && $(this).attr('data') !== 'active' && activeCounter === 0) {
-			$(this).attr('data','active');
-			$(this).addClass('active');
-			activeCounter = 1;
-			var  figure = window[$(this).children().attr('name')];
-			figure.checkFields(event);
-		} else if ($(this).attr('data') === 'active') {
-			$(this).removeAttr('data','active');
-			$(this).removeClass('active');
-			activeCounter = 0;
-		}
-
+ 	activeCounter = 0;
+ 	
+ 	$('td').click(function(event){
+ 		$('td').removeClass('possibleMove');
+ 		if ($(this).length > 0 && $(this).attr('data') !== 'active' && activeCounter === 0) {
+ 			$(this).attr('data','active');
+ 			$(this).addClass('active');
+ 			activeCounter = 1;
+ 			var  figure = window[$(this).attr('name')];
+ 			var moves=figure.checkFields(event);
+ 			for (var i = 0; i < moves.length; i++) {
+ 				$(moves[i]).addClass('possibleMove');
+ 			}
+ 		} else if ($(this).attr('data') === 'active') {
+ 			$(this).removeAttr('data','active');
+ 			$(this).removeClass('active');
+ 			activeCounter = 0;
+ 		}
  	});
-}	
+}		
 
 // Secilmish figuru hereket etdirir
 function move() {
@@ -155,9 +205,9 @@ function move() {
 
 	$('td').click(function(event){
 		var target = event.target;
-		
 		clickCounter = 1;
 		var activeFigure = $('#chessDesk').find('[data="active"]');
+
 		if (activeFigure.length > 0 && clickCounter === 1 && $(this).html().length === 0) {
 			$('#' + target.id).html(activeFigure.html());
 			activeFigure.removeClass('active');
@@ -167,17 +217,6 @@ function move() {
 		}
 	});
 }
-
-// Secilmish figurun gede bileceyi yerleri ishiqlandirmalidi. Uzerinde ishlemek lazimdi, bunu ya her bir objectin daxilinde checkFileds
-// metodunun icinde istifade etmek lazimdi, yada bashqa bir yerde
-
-// function showMoves() {
-//	for (var i = 0; i < possibleMoves.length; i++) {
-//		$(possibleMoves[i]).addClass('possibleMove');
-//	}
-//	console.log(possibleMoves);
-// }
-// showMoves();
 
 $(document).ready(function(){
 
