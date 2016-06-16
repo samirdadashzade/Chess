@@ -30,12 +30,32 @@ function createDesk() {
 
 // Object olaraq figurlar formallashdirilir ve taxta yazilir, her figurun oz checkFields metodu olmalidi
 function createSolders() {
-
 	rook = {
 		name: 'rook',
 		black: '&#9820',
-		white: '&#9814'
+		white: '&#9814',
 		// move: function() {}
+		checkFields: function(event) {
+			var target = $(event.target).parent();
+			var fieldData = target.attr('id').split('');
+			var row = Number(fieldData[0]);
+			var colum = colums.indexOf(fieldData[1]);
+			var possibleMoves = [];
+			var totalRows=$.grep(rows,function(item){
+				return item!=row;
+			});
+			var totalCols=$.grep(colums,function(item,index){
+				return index!=colum;
+			});
+			
+			totalRows.forEach(function(item,index){
+				if(colum!=-1){
+					possibleMoves.push('#'+item+colums[colum]);
+					possibleMoves.push('#'+row+totalCols[index]);
+				}
+			});
+			return possibleMoves;
+		}
 	};
 	knight = {
 		name: 'knight',
@@ -51,27 +71,24 @@ function createSolders() {
 			var target = $(event.target).parent();
 			var fieldData = target.attr('id').split('');
 			var row = Number(fieldData[0]);
-			var colum = colums.indexOf(fieldData[1])+1;
+			var colum = colums.indexOf(fieldData[1]);
 			var possibleMoves = [];
-			for (var i = 1; i <= 3; i++ ) {
-				if (colums[(colum - i) - 1] === undefined) {
-					var leftField = null;
-				} else {
-					var leftField = '#' + (row - i) + colums[(colum - i) - 1];
-					possibleMoves.push(leftField);
+			var totalRows=$.grep(rows,function(item){
+				return item!=row;
+			});			
+			totalRows.forEach(function(item,index){
+				if(colum!=-1){
+					if(colums[colum-(Math.abs(row-item))]!==undefined){
+						var cell='#'+item+colums[colum-(Math.abs(row-item))];
+						possibleMoves.push(cell);
+					}
+					if(colums[colum+(Math.abs(row-item))]!==undefined){
+						var cell='#'+item+colums[colum+(Math.abs(row-item))];
+						possibleMoves.push(cell);
+					}
 				}
-
-				if (colums[(colum + i) - 1] === undefined) {
-					var rightField = null;
-				} else {
-					var rightField = '#' + (row - i) + colums[(colum + i) - 1];
-					possibleMoves.push(rightField);
-				}
-			}
-			// return possibleMoves;
-			for (var i = 0; i < possibleMoves.length; i++) {
-				$(possibleMoves[i]).addClass('possibleMove');
-			}
+			});
+			return possibleMoves;
 		}
 	};
 
@@ -109,10 +126,7 @@ function createSolders() {
 					possibleMoves.push('#'+row+totalCols[index]);
 				}
 			});
-
-			for (var i = 0; i < possibleMoves.length; i++) {
-				$(possibleMoves[i]).addClass('possibleMove');
-			}
+			return possibleMoves;
 		}
 	};
 
@@ -174,13 +188,15 @@ function selectSolder() {
 			$(this).addClass('active');
 			activeCounter = 1;
 			var  figure = window[$(this).children().attr('name')];
-			console.log(figure.checkFields(event));
+			var moves=figure.checkFields(event);
+			for (var i = 0; i < moves.length; i++) {
+				$(moves[i]).addClass('possibleMove');
+			}
 		} else if ($(this).attr('data') === 'active') {
 			$(this).removeAttr('data','active');
 			$(this).removeClass('active');
 			activeCounter = 0;
 		}
-
  	});
 }	
 

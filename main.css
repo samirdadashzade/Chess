@@ -22,9 +22,10 @@ td {
 }
 
 .active {
-	background-color: yellow;;
+	background-color: #2DBB28;
 }
 
 .possibleMove {
-	background-color: red;
+	background-color: #2DBB28;
+	opacity: 0.5;
 }
