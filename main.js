@@ -47,30 +47,30 @@ function createSolders() {
 		name: 'bishop',
 		black: '&#9821',
 		white: '&#9815',
-		checkFields: function() {
-			$('td').click(function(event){
-				var target = $(event.target).parent();
-				var fieldData = target.attr('id').split('');
-				var row = Number(fieldData[0]);
-				var colum = colums.indexOf(fieldData[1])+1;
-				var possibleMoves = [];
-				for (var i = 1; i <= 3; i++ ) {
-					if (colums[(colum - i) - 1] === undefined) {
-						var leftField = null;
-					} else {
-						var leftField = '#' + (row - i) + colums[(colum - i) - 1];
-						possibleMoves.push(leftField);
-					}
-
-					if (colums[(colum + i) - 1] === undefined) {
-						var rightField = null;
-					} else {
-						var rightField = '#' + (row - i) + colums[(colum + i) - 1];
-						possibleMoves.push(rightField);
-					}
+		checkFields: function(x) {
+			var target = $(x.target).parent();
+			var fieldData = target.attr('id').split('');
+			var row = Number(fieldData[0]);
+			var colum = colums.indexOf(fieldData[1])+1;
+			var possibleMoves = [];
+			for (var i = 1; i <= 3; i++ ) {
+				if (colums[(colum - i) - 1] === undefined) {
+					var leftField = null;
+				} else {
+					var leftField = '#' + (row - i) + colums[(colum - i) - 1];
+					possibleMoves.push(leftField);
 				}
-				return possibleMoves;
-			});
+
+				if (colums[(colum + i) - 1] === undefined) {
+					var rightField = null;
+				} else {
+					var rightField = '#' + (row - i) + colums[(colum + i) - 1];
+					possibleMoves.push(rightField);
+				}
+			}
+			for (var i = 0; i < possibleMoves.length; i++) {
+				$(possibleMoves[i]).addClass('possibleMove');
+			}
 		}
 	};
 
@@ -98,30 +98,28 @@ function createSolders() {
 
 	};
 
-	$('#8a').html('<a class="figure" name=' + rook.name + '>'+ rook.black +'</a>');
-	$('#8b').html('<a class="figure" name=' + knight.name + '>'+ knight.black +'</a>');
-	$('#8c').html('<a class="figure" name=' + bishop.name + '>'+ bishop.black +'</a>');
-	$('#8d').html('<a class="figure" name=' + king.name + '>'+ king.black +'</a>');
-	$('#8e').html('<a class="figure" name=' + queen.name + '>'+ queen.black +'</a>');
-	$('#8f').html('<a class="figure" name=' + bishop.name + '>'+ bishop.black +'</a>');
-	$('#8g').html('<a class="figure" name=' + knight.name + '>'+ knight.black +'</a>');
-	$('#8h').html('<a class="figure" name=' + rook.name + '>'+ rook.black +'</a>');
-
+	$('#8a').attr('name',rook.name).html(rook.black);
+	$('#8b').attr('name',knight.name).html(knight.black);
+	$('#8c').attr('name',bishop.name).html(bishop.black);
+	$('#8d').attr('name',king.name).html(king.black);
+	$('#8e').attr('name',queen.name).html(queen.black);
+	$('#8f').attr('name',bishop.name).html(bishop.black);
+	$('#8g').attr('name',knight.name).html(knight.black);
+	$('#8h').attr('name',rook.name).html(rook.black);
 	for (i=0; i<colums.length; i++) {
-		$('#7'+colums[i]).html('<a class="figure" name=' + pawn.name + '>'+ pawn.black +'</a>');
+		$('#7'+colums[i]).attr('name',pawn.name).html(pawn.black);
 	}
 
-	$('#1a').html('<a class="figure" name=' + rook.name + '>'+ rook.white +'</a>');
-	$('#1b').html('<a class="figure" name=' + knight.name + '>'+ knight.white +'</a>');
-	$('#1c').html('<a class="figure" name=' + bishop.name + '>'+ bishop.white +'</a>');
-	$('#1d').html('<a class="figure" name=' + king.name + '>'+ king.white +'</a>');
-	$('#1e').html('<a class="figure" name=' + queen.name + '>'+ queen.white +'</a>');
-	$('#1f').html('<a class="figure" name=' + bishop.name + '>'+ bishop.white +'</a>');
-	$('#1g').html('<a class="figure" name=' + knight.name + '>'+ knight.white +'</a>');
-	$('#1h').html('<a class="figure" name=' + rook.name + '>'+ rook.white +'</a>');
-
+	$('#1a').attr('name',rook.name).html(rook.white);
+	$('#1b').attr('name',knight.name).html(knight.white);
+	$('#1c').attr('name',bishop.name).html(bishop.white);
+	$('#1d').attr('name',king.name).html(king.white);
+	$('#1e').attr('name',queen.name).html(queen.white);
+	$('#1f').attr('name',bishop.name).html(bishop.white);
+	$('#1g').attr('name',knight.name).html(knight.white);
+	$('#1h').attr('name',rook.name).html(rook.white);
 	for (i=0; i<colums.length; i++) {
-		$('#2'+colums[i]).html('<a class="figure" data="pawn">&#9817</a>');
+		$('#2'+colums[i]).attr('name',pawn.name).html(pawn.white);
 	}
 }
 
@@ -133,14 +131,14 @@ function selectSolder() {
 
 	activeCounter = 0;
 	
-	$('td').click(function(){
+	$('td').click(function(event){
 
 		if ($(this).length > 0 && $(this).attr('data') !== 'active' && activeCounter === 0) {
 			$(this).attr('data','active');
 			$(this).addClass('active');
 			activeCounter = 1;
 			var  figure = window[$(this).children().attr('name')];
-			// figure.checkFields()
+			figure.checkFields(event);
 		} else if ($(this).attr('data') === 'active') {
 			$(this).removeAttr('data','active');
 			$(this).removeClass('active');
