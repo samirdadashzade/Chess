@@ -180,19 +180,19 @@ function selectSolder() {
  	activeCounter = 0;
  	
  	$('td').click(function(event){
- 		$('td').removeClass('possibleMove');
  		if ($(this).length > 0 && $(this).attr('data') !== 'active' && activeCounter === 0) {
  			$(this).attr('data','active');
  			$(this).addClass('active');
  			activeCounter = 1;
- 			var  figure = window[$(this).attr('name')];
- 			var moves=figure.checkFields(event);
+ 			var figure = window[$(this).attr('name')];
+ 			var moves = figure.checkFields(event);
  			for (var i = 0; i < moves.length; i++) {
  				$(moves[i]).addClass('possibleMove');
  			}
  		} else if ($(this).attr('data') === 'active') {
  			$(this).removeAttr('data','active');
  			$(this).removeClass('active');
+ 			$('td').removeClass('possibleMove');
  			activeCounter = 0;
  		}
  	});
@@ -210,9 +210,12 @@ function move() {
 
 		if (activeFigure.length > 0 && clickCounter === 1 && $(this).html().length === 0) {
 			$('#' + target.id).html(activeFigure.html());
+			$('#' + target.id).attr('name', activeFigure.attr('name'));
 			activeFigure.removeClass('active');
 			activeFigure.removeAttr('data','active');
-			activeFigure.html(' ');
+			activeFigure.removeAttr('name');
+			$(activeFigure).empty();
+			$('td').removeClass('possibleMove');
 			activeCounter = 0;
 		}
 	});
