@@ -146,28 +146,28 @@ function createSolders() {
 
 	};
 
-	$('#8a').attr('name',rook.name).html(rook.black);
-	$('#8b').attr('name',knight.name).html(knight.black);
-	$('#8c').attr('name',bishop.name).html(bishop.black);
-	$('#8d').attr('name',king.name).html(king.black);
-	$('#8e').attr('name',queen.name).html(queen.black);
-	$('#8f').attr('name',bishop.name).html(bishop.black);
-	$('#8g').attr('name',knight.name).html(knight.black);
-	$('#8h').attr('name',rook.name).html(rook.black);
+	$('#8a').attr('name',rook.name).attr('data-side', 'dark').html(rook.black);
+	$('#8b').attr('name',knight.name).attr('data-side', 'dark').html(knight.black);
+	$('#8c').attr('name',bishop.name).attr('data-side', 'dark').html(bishop.black);
+	$('#8d').attr('name',king.name).attr('data-side', 'dark').html(king.black);
+	$('#8e').attr('name',queen.name).attr('data-side', 'dark').html(queen.black);
+	$('#8f').attr('name',bishop.name).attr('data-side', 'dark').html(bishop.black);
+	$('#8g').attr('name',knight.name).attr('data-side', 'dark').html(knight.black);
+	$('#8h').attr('name',rook.name).attr('data-side', 'dark').html(rook.black);
 	for (i=0; i<colums.length; i++) {
-		$('#7'+colums[i]).attr('name',pawn.name).html(pawn.black);
+		$('#7'+colums[i]).attr('name',pawn.name).attr('data-side', 'dark').html(pawn.black);
 	}
 
-	$('#1a').attr('name',rook.name).html(rook.white);
-	$('#1b').attr('name',knight.name).html(knight.white);
-	$('#1c').attr('name',bishop.name).html(bishop.white);
-	$('#1d').attr('name',king.name).html(king.white);
-	$('#1e').attr('name',queen.name).html(queen.white);
-	$('#1f').attr('name',bishop.name).html(bishop.white);
-	$('#1g').attr('name',knight.name).html(knight.white);
-	$('#1h').attr('name',rook.name).html(rook.white);
+	$('#1a').attr('name',rook.name).attr('data-side', 'light').html(rook.white);
+	$('#1b').attr('name',knight.name).attr('data-side', 'light').html(knight.white);
+	$('#1c').attr('name',bishop.name).attr('data-side', 'light').html(bishop.white);
+	$('#1d').attr('name',king.name).attr('data-side', 'light').html(king.white);
+	$('#1e').attr('name',queen.name).attr('data-side', 'light').html(queen.white);
+	$('#1f').attr('name',bishop.name).attr('data-side', 'light').html(bishop.white);
+	$('#1g').attr('name',knight.name).attr('data-side', 'light').html(knight.white);
+	$('#1h').attr('name',rook.name).attr('data-side', 'light').html(rook.white);
 	for (i=0; i<colums.length; i++) {
-		$('#2'+colums[i]).attr('name',pawn.name).html(pawn.white);
+		$('#2'+colums[i]).attr('name',pawn.name).attr('data-side', 'light').html(pawn.white);
 	}
 }
 
@@ -212,15 +212,27 @@ function move() {
 			if (moves.indexOf('#' + target.id) > -1) {
 				$('#' + target.id).html(activeFigure.html());
 				$('#' + target.id).attr('name', activeFigure.attr('name'));
+				$('#' + target.id).attr('data-side', activeFigure.attr('data-side'));
 				activeFigure.removeClass('active');
+ 				activeFigure.removeAttr('data-side');
 				activeFigure.removeAttr('data','active');
 				activeFigure.removeAttr('name');
 				$(activeFigure).empty();
 				$('td').removeClass('possibleMove');
 				activeCounter = 0;
 			}
+		} else if ($(this).html().length !== 0 && $(this).attr('data-side') !== activeFigure.attr('data-side')) {
+			$('#' + target.id).html(activeFigure.html());
+			$('#' + target.id).attr('name', activeFigure.attr('name'));
+			$('#' + target.id).attr('data-side', activeFigure.attr('data-side'));
+			activeFigure.removeClass('active');
+			activeFigure.removeAttr('data','active');
+			activeFigure.removeAttr('name');
+			$(activeFigure).empty();
+			$('td').removeClass('possibleMove');
+			activeCounter = 0;
 		}
-		// console.log(moves);
+		// console.log($(this).attr('data-side') !== activeFigure.attr('data-side'));
 	});
 }
 
