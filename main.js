@@ -185,7 +185,7 @@ function selectSolder() {
  			$(this).addClass('active');
  			activeCounter = 1;
  			var figure = window[$(this).attr('name')];
- 			var moves = figure.checkFields(event);
+ 			moves = figure.checkFields(event);
  			for (var i = 0; i < moves.length; i++) {
  				$(moves[i]).addClass('possibleMove');
  			}
@@ -209,17 +209,21 @@ function move() {
 		var activeFigure = $('#chessDesk').find('[data="active"]');
 
 		if (activeFigure.length > 0 && clickCounter === 1 && $(this).html().length === 0) {
-			$('#' + target.id).html(activeFigure.html());
-			$('#' + target.id).attr('name', activeFigure.attr('name'));
-			activeFigure.removeClass('active');
-			activeFigure.removeAttr('data','active');
-			activeFigure.removeAttr('name');
-			$(activeFigure).empty();
-			$('td').removeClass('possibleMove');
-			activeCounter = 0;
+			if (moves.indexOf('#' + target.id) > -1) {
+				$('#' + target.id).html(activeFigure.html());
+				$('#' + target.id).attr('name', activeFigure.attr('name'));
+				activeFigure.removeClass('active');
+				activeFigure.removeAttr('data','active');
+				activeFigure.removeAttr('name');
+				$(activeFigure).empty();
+				$('td').removeClass('possibleMove');
+				activeCounter = 0;
+			}
 		}
+		// console.log(moves);
 	});
 }
+
 
 $(document).ready(function(){
 
@@ -227,6 +231,5 @@ $(document).ready(function(){
 	createSolders();
 	selectSolder();
 	move();
-	// showMoves();
 
 });
