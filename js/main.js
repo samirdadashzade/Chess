@@ -97,6 +97,12 @@ function createSolders() {
 		black: '&#9818',
 		white: '&#9812',
 		// move: function() {}
+	};
+
+	king = {
+		name: 'king',
+		black: '&#9819',
+		white: '&#9813',
 		checkFields: function(event) {
 			var target = $(event.target);
 			var fieldData = target.attr('id').split('');
@@ -130,20 +136,10 @@ function createSolders() {
 		}
 	};
 
-	king = {
-		name: 'king',
-		black: '&#9819',
-		white: '&#9813'
-		// move: function() {}
-
-	};
-
 	pawn = {
 		name: 'pawn',
 		black: '&#9823',
 		white: '&#9817'
-		// move: function() {}
-
 	};
 
 	$('#8a').attr('name',rook.name).attr('data-side', 'dark').html(rook.black);
