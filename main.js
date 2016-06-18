@@ -180,7 +180,7 @@ function selectSolder() {
  	activeCounter = 0;
  	
  	$('td').click(function(event){
- 		if ($(this).length > 0 && $(this).attr('data') !== 'active' && activeCounter === 0) {
+ 		if ($(this).html().length > 0 && $(this).attr('data') !== 'active' && activeCounter === 0) {
  			$(this).attr('data','active');
  			$(this).addClass('active');
  			activeCounter = 1;
@@ -214,14 +214,14 @@ function move() {
 				$('#' + target.id).attr('name', activeFigure.attr('name'));
 				$('#' + target.id).attr('data-side', activeFigure.attr('data-side'));
 				activeFigure.removeClass('active');
- 				activeFigure.removeAttr('data-side');
+				activeFigure.removeAttr('data-side');
 				activeFigure.removeAttr('data','active');
 				activeFigure.removeAttr('name');
 				$(activeFigure).empty();
 				$('td').removeClass('possibleMove');
 				activeCounter = 0;
 			}
-		} else if ($(this).html().length !== 0 && $(this).attr('data-side') !== activeFigure.attr('data-side')) {
+		} else if ($(this).html().length !== 0 && $(this).attr('data-side') !== activeFigure.attr('data-side') && moves.indexOf('#' + target.id) > -1) {
 			$('#' + target.id).html(activeFigure.html());
 			$('#' + target.id).attr('name', activeFigure.attr('name'));
 			$('#' + target.id).attr('data-side', activeFigure.attr('data-side'));
