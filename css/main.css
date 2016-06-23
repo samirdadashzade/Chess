@@ -1,0 +1,32 @@
+
+table {
+	width: 700px;
+	height: 700px;
+	margin: 0 auto;
+	border: 1px solid #ccc;
+}
+
+.white, .black {
+	width: 10%;
+	height: 10%;
+}
+
+.black {
+	background-color: #ccc;
+}
+
+td {
+	font-size: 50px;
+	text-align: center;
+	align-items: center;
+	cursor: pointer;
+}
+
+.active {
+	background-color: #2DBB28;
+}
+
+.possibleMove {
+	background-color: #2DBB28;
+	opacity: 0.5;
+}
