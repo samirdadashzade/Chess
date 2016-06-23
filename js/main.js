@@ -58,7 +58,45 @@ function createSolders() {
 	knight = {
 		name: 'knight',
 		black: '&#9822',
-		white: '&#9816'
+		white: '&#9816',
+		checkFields: function(event) {
+			var target = $(event.target);
+			var fieldData = target.attr('id').split('');
+			var row = Number(fieldData[0]);
+			var colum = colums.indexOf(fieldData[1]);
+			var possibleMoves = [], count=1, addRow, addCol;
+			//row up&down
+			for(var i=0;i<=3;i++){
+				switch(true){
+					case (i==0):
+						addRow=2;
+						addCol=1;
+						break;
+					case (i==1):
+						addRow=-2;
+						addCol=1;
+						break;
+					case (i==2):
+						addRow=1;
+						addCol=2;
+						break;	
+					case (i==3):
+						addRow=-1;
+						addCol=2;
+						break;
+				}
+				if((row+addRow)>0&&(row+addRow)<=8&&colums[colum+addCol]!=undefined){
+					var cell='#'+(row+addRow)+colums[colum+addCol];
+					possibleMoves.push(cell);
+				}
+				if((row+addRow)>0&&(row+addRow)<=8&&colums[colum+addCol]!=undefined){
+					var cell='#'+(row+addRow)+colums[colum-addCol];
+					possibleMoves.push(cell);
+				}
+			}
+
+			return possibleMoves;
+		}
 		// move: function() {}
 	};
 	bishop = {
@@ -92,6 +130,42 @@ function createSolders() {
 		name: 'queen',
 		black: '&#9818',
 		white: '&#9812',
+		checkFields: function(event) {
+			var target = $(event.target);
+			var fieldData = target.attr('id').split('');
+			var row = Number(fieldData[0]);
+			var colum = colums.indexOf(fieldData[1]);
+			var possibleMoves = [], addRow=1;;
+			for(var i=1;i<=2;i++){
+				if((row+addRow)>0&&(row+addRow)<=8&&colums[colum]!=undefined){
+					var cell='#'+(row+addRow)+colums[colum];
+					if(checkType(target,cell))
+						possibleMoves.push(cell);
+				}
+				if((row+addRow)>0&&(row+addRow)<=8&&colums[colum+1]!=undefined){
+					var cell='#'+(row+addRow)+colums[colum+1];
+					if(checkType(target,cell))
+						possibleMoves.push(cell);
+				}
+				if((row+addRow)>0&&(row+addRow)<=8&&colums[colum-1]!=undefined){
+					var cell='#'+(row+addRow)+colums[colum-1];
+					if(checkType(target,cell))
+						possibleMoves.push(cell);
+				}
+				addRow=-1;
+			}
+			if(colums[colum-1]!=undefined){
+				var cell='#'+row+colums[colum-1];
+				if(checkType(target,cell))
+						possibleMoves.push(cell);
+			}
+			if(colums[colum+1]!=undefined){
+				var cell='#'+row+colums[colum+1];
+				if(checkType(target,cell))
+						possibleMoves.push(cell);
+			}
+			return possibleMoves;
+		}
 		// move: function() {}
 	};
 
@@ -266,6 +340,15 @@ function move() {
 	});
 }
 
+function checkType(target,id){
+	if($(id).attr('data-side')==undefined){
+		return true;
+	} else if($(id).attr('data-side')!=target.attr('data-side')){
+		return true;
+	} else{
+		return false;
+	}		
+}
 
 $(document).ready(function(){
 
