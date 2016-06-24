@@ -87,11 +87,13 @@ function createSolders() {
 				}
 				if((row+addRow)>0&&(row+addRow)<=8&&colums[colum+addCol]!=undefined){
 					var cell='#'+(row+addRow)+colums[colum+addCol];
-					possibleMoves.push(cell);
+					if(checkType(target,cell))
+						possibleMoves.push(cell);
 				}
-				if((row+addRow)>0&&(row+addRow)<=8&&colums[colum+addCol]!=undefined){
+				if((row+addRow)>0&&(row+addRow)<=8&&colums[colum-addCol]!=undefined){
 					var cell='#'+(row+addRow)+colums[colum-addCol];
-					possibleMoves.push(cell);
+					if(checkType(target,cell))
+						possibleMoves.push(cell);
 				}
 			}
 
@@ -189,9 +191,8 @@ function createSolders() {
  			});
  			
  			totalRows.forEach(function(item,index){
- 				// Queen xMoves
- 				
-;				if(colums[colum-(Math.abs(row-item))]!==undefined){
+ 				// Queen xMoves	
+				if(colums[colum-(Math.abs(row-item))]!==undefined){
  					var cell='#'+item+colums[colum-(Math.abs(row-item))];
  					possibleMoves.push(cell);
  				}
@@ -341,12 +342,10 @@ function move() {
 }
 
 function checkType(target,id){
-	if($(id).attr('data-side')==undefined){
-		return true;
-	} else if($(id).attr('data-side')!=target.attr('data-side')){
-		return true;
-	} else{
+	if($(id).attr('data-side')===target.attr('data-side')){
 		return false;
+	} else {
+		return true;
 	}		
 }
 
