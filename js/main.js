@@ -5,6 +5,7 @@ function createDesk() {
 	rows = [8,7,6,5,4,3,2,1];
 	colums = ['a','b','c','d','e','f','g','h'];
 	turn = 0;
+	log = [];
 
 	for (i = 0; i < rows.length; i++) {
 	 	var tr = document.createElement('tr');
@@ -43,6 +44,14 @@ function createSideBar() {
 		$(tablo).html("Black's turn");
 	}
 	$('#left-side').append(tablo);
+
+	$('.log').remove();
+	var history = document.createElement('ul');
+	$(history).addClass('log');
+	$('#left-side').append(history);
+	for (var i = 0; i < log.length; i++) {
+		$('.log').append(log[i]);
+	}
 
 }
 
@@ -358,13 +367,19 @@ function move() {
 			activeFigure.removeAttr('data-firstMove');
 			activeFigure.removeAttr('data','active');
 			activeFigure.removeAttr('name');
-			// $(activeFigure).empty();
+			$(activeFigure).empty();
 			$('td').removeClass('possibleMove');
 			activeCounter = 0;
 			
 			$(activeFigure).empty();
 			turn++;
-			console.log('Top func');
+			var t = new Date();
+			var currentTime = t.getHours() + ':' + t.getMinutes() + ':' + t.getSeconds();
+			var newMove = '<li class="' + $(target).attr('data-side') + '">['+ $(target).attr('data-side') + 's] : ' + 
+			$(target).attr('name') + ' moved from ' + $(activeFigure).attr('id') + ' to ' + $(target).attr('id') + ' at ' + currentTime + '</li>';
+			
+			log.push(newMove);
+			console.log(log);
 			createSideBar();
 		} else if ($(this).html().length !== 0 && activeFigure.length > 0 && $(this).attr('data-side') !== activeFigure.attr('data-side') && moves.indexOf('#' + target.id) > -1) {
 			$('#' + target.id).html(activeFigure.html());
@@ -380,13 +395,19 @@ function move() {
 			activeFigure.removeAttr('data-side');
 			activeFigure.removeAttr('data','active');
 			activeFigure.removeAttr('name');
-			// $(activeFigure).empty();
+			$(activeFigure).empty();
 			$('td').removeClass('possibleMove');
 			activeCounter = 0;
 			
 			$(activeFigure).empty();
 			turn++;
-			console.log('bottom func');
+			var t = new Date();
+			var currentTime = t.getHours() + ':' + t.getMinutes() + ':' + t.getSeconds();
+			var newMove = '<li class="' + $(target).attr('data-side') + '">['+ $(target).attr('data-side') + 's] : ' + 
+			$(target).attr('name') + ' moved from ' + $(activeFigure).attr('id') + ' to ' + $(target).attr('id') + ' at ' + currentTime + '</li>';
+			
+			log.push(newMove);
+			console.log(log);
 			createSideBar();
 		}
 	});

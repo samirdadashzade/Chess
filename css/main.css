@@ -50,4 +50,28 @@ body {
 	text-align: center;
 	padding: 10px;
 	font-weight: bold;
+	background-color: #000;
+	color: #fff;
 }
+
+.log {
+	border: 1px solid black;
+	height: 300px;
+	margin-top: 0px;
+	padding: 0px;
+	overflow: scroll;
+}
+
+.log li {
+	list-style: none;
+	font-size: 13px;
+	padding-left: 10px;
+}
+
+/*.log .dark {
+	float: right;
+}
+.log .light {
+	float: left;
+}
+*/
