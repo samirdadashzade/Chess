@@ -41,17 +41,14 @@ function createSolders() {
 			var row = Number(fieldData[0]);
 			var colum = colums.indexOf(fieldData[1]);
 			var possibleMoves = [];
-			var totalRows=$.grep(rows,function(item){
-				return item!=row;
-			});
-			var totalCols=$.grep(colums,function(item,index){
-				return index!=colum;
-			});
-			
-			totalRows.forEach(function(item,index){
-				possibleMoves.push('#'+item+colums[colum]);
-				possibleMoves.push('#'+row+totalCols[index]);
-			});
+			var upMoves=rows.slice(0,$.inArray(row,rows)).reverse();
+			var downMoves=rows.slice($.inArray(row,rows)+1);
+			var leftMoves=colums.slice(0,colum).reverse();
+			var rightMoves=colums.slice(colum+1);
+			pushPossibleMove(upMoves,target,possibleMoves,'colum',colum);
+			pushPossibleMove(downMoves,target,possibleMoves,'colum',colum);
+			pushPossibleMove(leftMoves,target,possibleMoves,'row',row);
+			pushPossibleMove(rightMoves,target,possibleMoves,'row',row);
 			return possibleMoves;
 		}
 	};
@@ -87,12 +84,12 @@ function createSolders() {
 				}
 				if((row+addRow)>0&&(row+addRow)<=8&&colums[colum+addCol]!=undefined){
 					var cell='#'+(row+addRow)+colums[colum+addCol];
-					if(checkType(target,cell))
+					if(checkType(target,cell)==true||checkType(target,cell)==null)
 						possibleMoves.push(cell);
 				}
 				if((row+addRow)>0&&(row+addRow)<=8&&colums[colum-addCol]!=undefined){
 					var cell='#'+(row+addRow)+colums[colum-addCol];
-					if(checkType(target,cell))
+					if(checkType(target,cell)==true||checkType(target,cell)==null)
 						possibleMoves.push(cell);
 				}
 			}
@@ -321,8 +318,8 @@ function move() {
 			$(activeFigure).empty();
 			$('td').removeClass('possibleMove');
 			activeCounter = 0;
-			if(typeof(target.attr('data-firstMove')) != undefined) {
-				target.attr('data-firstMove') = 1;
+			if(typeof($(target).attr('data-firstMove')) != undefined) {
+				$(target).attr('data-firstMove',1);
 			}
 		} else if ($(this).html().length !== 0 && $(this).attr('data-side') !== activeFigure.attr('data-side') && moves.indexOf('#' + target.id) > -1) {
 			$('#' + target.id).html(activeFigure.html());
@@ -344,9 +341,29 @@ function move() {
 function checkType(target,id){
 	if($(id).attr('data-side')===target.attr('data-side')){
 		return false;
-	} else {
+	} else if($(id).attr('data-side')==undefined){
+		return null;
+	} else{
 		return true;
-	}		
+	}
+}
+
+function pushPossibleMove(array,target,possibleMoves,columOrRow,number){
+	for(var i=0;i<array.length;i++){
+		if(arguments[3]==='colum'){
+			var cell='#'+array[i]+colums[number];
+		}else{
+			var cell='#'+number+array[i];
+		}
+		if(checkType(target,cell)==null){
+			possibleMoves.push(cell);
+		}else if(checkType(target,cell)==true){
+			possibleMoves.push(cell);
+			break;
+		}else{
+			break;
+		}
+	};
 }
 
 $(document).ready(function(){
