@@ -57,7 +57,6 @@ function createSideBar() {
 
 // Object olaraq figurlar formallashdirilir ve taxta yazilir, her figurun oz checkFields metodu olmalidi
 function createSolders() {
-
 	rook = {
 		name: 'rook',
 		black: '&#9820',
@@ -72,11 +71,12 @@ function createSolders() {
 			var downMoves=rows.slice($.inArray(row,rows)+1);
 			var leftMoves=colums.slice(0,colum).reverse();
 			var rightMoves=colums.slice(colum+1);
-			pushPossibleMove(upMoves,target,possibleMoves,'colum',colum);
-			pushPossibleMove(downMoves,target,possibleMoves,'colum',colum);
-			pushPossibleMove(leftMoves,target,possibleMoves,'row',row);
-			pushPossibleMove(rightMoves,target,possibleMoves,'row',row);
+			rookPushMove(upMoves,target,possibleMoves,'colum',colum);
+			rookPushMove(downMoves,target,possibleMoves,'colum',colum);
+			rookPushMove(leftMoves,target,possibleMoves,'row',row);
+			rookPushMove(rightMoves,target,possibleMoves,'row',row);
 			return possibleMoves;
+
 		}
 	};
 	knight = {
@@ -135,23 +135,17 @@ function createSolders() {
 			var row = Number(fieldData[0]);
 			var colum = colums.indexOf(fieldData[1]);
 			var possibleMoves = [];
-			var totalRows=$.grep(rows,function(item){
-			   	return item!=row;
-			});			
-			totalRows.forEach(function(item,index){
-				if(colums[colum-(Math.abs(row-item))] !== undefined){
-					var cell='#'+item+colums[colum-(Math.abs(row-item))];
-					possibleMoves.push(cell);
-				}
-				if(colums[colum+(Math.abs(row-item))] !== undefined){
-					var cell='#'+item+colums[colum+(Math.abs(row-item))];
-					possibleMoves.push(cell);
-				}
-			});
+			var upMoves=rows.slice(0,$.inArray(row,rows)).reverse();
+			var downMoves=rows.slice($.inArray(row,rows)+1);
+			
+			bishopPushMove(upMoves,target,possibleMoves,row,colum,'left');
+			bishopPushMove(upMoves,target,possibleMoves,row,colum,'right');
+			bishopPushMove(downMoves,target,possibleMoves,row,colum,'left');
+			bishopPushMove(downMoves,target,possibleMoves,row,colum,'right');
 			return possibleMoves;
+			
 		}
 	};
-
 	queen = {
 		name: 'queen',
 		black: '&#9818',
@@ -194,7 +188,6 @@ function createSolders() {
 		}
 		// move: function() {}
 	};
-
 	king = {
 		name: 'king',
 		black: '&#9819',
@@ -205,33 +198,22 @@ function createSolders() {
 			var row = Number(fieldData[0]);
 			var colum = colums.indexOf(fieldData[1]);
 			var possibleMoves = [];
+			var upMoves=rows.slice(0,$.inArray(row,rows)).reverse();
+			var downMoves=rows.slice($.inArray(row,rows)+1);
+			var leftMoves=colums.slice(0,colum).reverse();
+			var rightMoves=colums.slice(colum+1);
+			rookPushMove(upMoves,target,possibleMoves,'colum',colum);
+			rookPushMove(downMoves,target,possibleMoves,'colum',colum);
+			rookPushMove(leftMoves,target,possibleMoves,'row',row);
+			rookPushMove(rightMoves,target,possibleMoves,'row',row);
+			bishopPushMove(upMoves,target,possibleMoves,row,colum,'left');
+			bishopPushMove(upMoves,target,possibleMoves,row,colum,'right');
+			bishopPushMove(downMoves,target,possibleMoves,row,colum,'left');
+			bishopPushMove(downMoves,target,possibleMoves,row,colum,'right');
 
-			var totalRows=$.grep(rows,function(item){
-				return item!=row;
-			});
-
-			var totalCols=$.grep(colums,function(item,index){
-				return index!=colum;
-			});
-			
-			totalRows.forEach(function(item,index){
-				// Queen xMoves	
-				if(colums[colum-(Math.abs(row-item))]!==undefined){
-					var cell='#'+item+colums[colum-(Math.abs(row-item))];
-					possibleMoves.push(cell);
-				}
-				if(colums[colum+(Math.abs(row-item))]!==undefined){
-					var cell='#'+item+colums[colum+(Math.abs(row-item))];
-					possibleMoves.push(cell);
-				}
-				// Queen plus moves
-				possibleMoves.push('#'+item+colums[colum]);
-				possibleMoves.push('#'+row+totalCols[index]);
-			});
 			return possibleMoves;
 		}
 	};
-
 	pawn = {
 		name: 'pawn',
 		black: '&#9823',
@@ -423,7 +405,7 @@ function checkType(target,id){
 	}
 }
 
-function pushPossibleMove(array,target,possibleMoves,columOrRow,number){
+function rookPushMove(array,target,possibleMoves,columOrRow,number){
 	for(var i=0;i<array.length;i++){
 		if(arguments[3]==='colum'){
 			var cell='#'+array[i]+colums[number];
@@ -439,6 +421,27 @@ function pushPossibleMove(array,target,possibleMoves,columOrRow,number){
 			break;
 		}
 	};
+}
+
+function bishopPushMove(array,target,possibleMoves,row,colum,leftOrRight){
+	for(var i=0;i<array.length;i++){
+		if(leftOrRight=='left'){
+			$checkCol=colums[colum-(Math.abs(row-array[i]))];
+		}else{
+			$checkCol=colums[colum+(Math.abs(row-array[i]))];
+		}
+		if($checkCol!== undefined){
+			var cell='#'+array[i]+$checkCol;
+			if(checkType(target,cell)==null){
+				possibleMoves.push(cell);
+			}else if(checkType(target,cell)==true){
+				possibleMoves.push(cell);
+				break;
+			}else{
+				break;
+			}
+		}
+	}
 }
 
 $(document).ready(function(){
