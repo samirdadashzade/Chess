@@ -41,24 +41,61 @@ function createSolders() {
 			var row = Number(fieldData[0]);
 			var colum = colums.indexOf(fieldData[1]);
 			var possibleMoves = [];
-			var totalRows=$.grep(rows,function(item){
-				return item!=row;
-			});
-			var totalCols=$.grep(colums,function(item,index){
-				return index!=colum;
-			});
-			
-			totalRows.forEach(function(item,index){
-				possibleMoves.push('#'+item+colums[colum]);
-				possibleMoves.push('#'+row+totalCols[index]);
-			});
+			var upMoves=rows.slice(0,$.inArray(row,rows)).reverse();
+			var downMoves=rows.slice($.inArray(row,rows)+1);
+			var leftMoves=colums.slice(0,colum).reverse();
+			var rightMoves=colums.slice(colum+1);
+			pushPossibleMove(upMoves,target,possibleMoves,'colum',colum);
+			pushPossibleMove(downMoves,target,possibleMoves,'colum',colum);
+			pushPossibleMove(leftMoves,target,possibleMoves,'row',row);
+			pushPossibleMove(rightMoves,target,possibleMoves,'row',row);
 			return possibleMoves;
 		}
 	};
 	knight = {
 		name: 'knight',
 		black: '&#9822',
-		white: '&#9816'
+		white: '&#9816',
+		checkFields: function(event) {
+			var target = $(event.target);
+			var fieldData = target.attr('id').split('');
+			var row = Number(fieldData[0]);
+			var colum = colums.indexOf(fieldData[1]);
+			var possibleMoves = [], count=1, addRow, addCol;
+			//row up&down
+			for(var i=0;i<=3;i++){
+				switch(true){
+					case (i==0):
+						addRow=2;
+						addCol=1;
+						break;
+					case (i==1):
+						addRow=-2;
+						addCol=1;
+						break;
+					case (i==2):
+						addRow=1;
+						addCol=2;
+						break;	
+					case (i==3):
+						addRow=-1;
+						addCol=2;
+						break;
+				}
+				if((row+addRow)>0&&(row+addRow)<=8&&colums[colum+addCol]!=undefined){
+					var cell='#'+(row+addRow)+colums[colum+addCol];
+					if(checkType(target,cell)==true||checkType(target,cell)==null)
+						possibleMoves.push(cell);
+				}
+				if((row+addRow)>0&&(row+addRow)<=8&&colums[colum-addCol]!=undefined){
+					var cell='#'+(row+addRow)+colums[colum-addCol];
+					if(checkType(target,cell)==true||checkType(target,cell)==null)
+						possibleMoves.push(cell);
+				}
+			}
+
+			return possibleMoves;
+		}
 		// move: function() {}
 	};
 	bishop = {
@@ -92,6 +129,42 @@ function createSolders() {
 		name: 'queen',
 		black: '&#9818',
 		white: '&#9812',
+		checkFields: function(event) {
+			var target = $(event.target);
+			var fieldData = target.attr('id').split('');
+			var row = Number(fieldData[0]);
+			var colum = colums.indexOf(fieldData[1]);
+			var possibleMoves = [], addRow=1;;
+			for(var i=1;i<=2;i++){
+				if((row+addRow)>0&&(row+addRow)<=8&&colums[colum]!=undefined){
+					var cell='#'+(row+addRow)+colums[colum];
+					if(checkType(target,cell) == null || checkType(target,cell) == true )
+						possibleMoves.push(cell);
+				}
+				if((row+addRow)>0&&(row+addRow)<=8&&colums[colum+1]!=undefined){
+					var cell='#'+(row+addRow)+colums[colum+1];
+					if(checkType(target,cell) == null || checkType(target,cell) == true )
+						possibleMoves.push(cell);
+				}
+				if((row+addRow)>0&&(row+addRow)<=8&&colums[colum-1]!=undefined){
+					var cell='#'+(row+addRow)+colums[colum-1];
+					if(checkType(target,cell) == null || checkType(target,cell) == true )
+						possibleMoves.push(cell);
+				}
+				addRow=-1;
+			}
+			if(colums[colum-1]!=undefined){
+				var cell='#'+row+colums[colum-1];
+				if(checkType(target,cell) == null || checkType(target,cell) == true )
+						possibleMoves.push(cell);
+			}
+			if(colums[colum+1]!=undefined){
+				var cell='#'+row+colums[colum+1];
+				if(checkType(target,cell) == null || checkType(target,cell) == true )
+						possibleMoves.push(cell);
+			}
+			return possibleMoves;
+		}
 		// move: function() {}
 	};
 
@@ -110,28 +183,27 @@ function createSolders() {
 				return item!=row;
 			});
 
- 			var totalCols=$.grep(colums,function(item,index){
- 				return index!=colum;
- 			});
- 			
- 			totalRows.forEach(function(item,index){
- 				// Queen xMoves
- 				
-;				if(colums[colum-(Math.abs(row-item))]!==undefined){
- 					var cell='#'+item+colums[colum-(Math.abs(row-item))];
- 					possibleMoves.push(cell);
- 				}
- 				if(colums[colum+(Math.abs(row-item))]!==undefined){
- 					var cell='#'+item+colums[colum+(Math.abs(row-item))];
- 					possibleMoves.push(cell);
- 				}
- 				// Queen plus moves
- 				possibleMoves.push('#'+item+colums[colum]);
- 				possibleMoves.push('#'+row+totalCols[index]);
- 			});
- 			return possibleMoves;
- 		}
- 	};
+			var totalCols=$.grep(colums,function(item,index){
+				return index!=colum;
+			});
+			
+			totalRows.forEach(function(item,index){
+				// Queen xMoves	
+				if(colums[colum-(Math.abs(row-item))]!==undefined){
+					var cell='#'+item+colums[colum-(Math.abs(row-item))];
+					possibleMoves.push(cell);
+				}
+				if(colums[colum+(Math.abs(row-item))]!==undefined){
+					var cell='#'+item+colums[colum+(Math.abs(row-item))];
+					possibleMoves.push(cell);
+				}
+				// Queen plus moves
+				possibleMoves.push('#'+item+colums[colum]);
+				possibleMoves.push('#'+row+totalCols[index]);
+			});
+			return possibleMoves;
+		}
+	};
 
 	pawn = {
 		name: 'pawn',
@@ -246,8 +318,8 @@ function move() {
 			$(activeFigure).empty();
 			$('td').removeClass('possibleMove');
 			activeCounter = 0;
-			if(typeof(target.attr('data-firstMove')) != undefined) {
-				target.attr('data-firstMove') = 1;
+			if(typeof($(target).attr('data-firstMove')) != undefined) {
+				$(target).attr('data-firstMove',1);
 			}
 		} else if ($(this).html().length !== 0 && $(this).attr('data-side') !== activeFigure.attr('data-side') && moves.indexOf('#' + target.id) > -1) {
 			$('#' + target.id).html(activeFigure.html());
@@ -266,6 +338,33 @@ function move() {
 	});
 }
 
+function checkType(target,id){
+	if($(id).attr('data-side')===target.attr('data-side')){
+		return false;
+	} else if($(id).attr('data-side')==undefined){
+		return null;
+	} else{
+		return true;
+	}
+}
+
+function pushPossibleMove(array,target,possibleMoves,columOrRow,number){
+	for(var i=0;i<array.length;i++){
+		if(arguments[3]==='colum'){
+			var cell='#'+array[i]+colums[number];
+		}else{
+			var cell='#'+number+array[i];
+		}
+		if(checkType(target,cell)==null){
+			possibleMoves.push(cell);
+		}else if(checkType(target,cell)==true){
+			possibleMoves.push(cell);
+			break;
+		}else{
+			break;
+		}
+	};
+}
 
 $(document).ready(function(){
 
