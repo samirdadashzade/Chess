@@ -355,8 +355,9 @@ function move() {
 				$(target).attr('data-firstMove',1);
 			}
 			turn++;
+			console.log('Top func');
 			createSideBar();
-		} else if ($(this).html().length !== 0 && $(this).attr('data-side') !== activeFigure.attr('data-side') && moves.indexOf('#' + target.id) > -1) {
+		} else if ($(this).html().length !== 0 && activeFigure.length > 0 && $(this).attr('data-side') !== activeFigure.attr('data-side') && moves.indexOf('#' + target.id) > -1) {
 			$('#' + target.id).html(activeFigure.html());
 			$('#' + target.id).attr('name', activeFigure.attr('name'));
 			$('#' + target.id).attr('data-side', activeFigure.attr('data-side'));
@@ -370,6 +371,7 @@ function move() {
 				$(target).attr('data-firstMove', 1);
 			}
 			turn++;
+			console.log('bottom func');
 			createSideBar();
 		}
 	});
