@@ -3,6 +3,7 @@ function createDesk() {
 
 	rows = [8,7,6,5,4,3,2,1];
 	colums = ['a','b','c','d','e','f','g','h'];
+	turn = 0;
 
 	for (i = 0; i < rows.length; i++) {
 	 	var tr = document.createElement('tr');
@@ -276,23 +277,38 @@ function createSolders() {
 
 function selectSolder() {
 
- 	activeCounter = 0;
- 	
- 	$('td').click(function(event){
- 		if ($(this).html().length > 0 && $(this).attr('data') !== 'active' && activeCounter === 0) {
- 			$(this).attr('data','active');
- 			$(this).addClass('active');
- 			activeCounter = 1;
- 			var figure = window[$(this).attr('name')];
- 			moves = figure.checkFields(event);
- 			for (var i = 0; i < moves.length; i++) {
- 				$(moves[i]).addClass('possibleMove');
- 			}
+	activeCounter = 0;
+	
+	$('td').click(function(event){
+		if ($(this).html().length > 0 && $(this).attr('data') !== 'active' && activeCounter === 0) {
+
+			if (turn%2 != 0 && $(this).attr('data-side') === 'dark') {
+				$(this).attr('data','active');
+				$(this).addClass('active');
+				activeCounter = 1;
+				var figure = window[$(this).attr('name')];
+				moves = figure.checkFields(event);
+				for (var i = 0; i < moves.length; i++) {
+					$(moves[i]).addClass('possibleMove');
+				}
+			} else if (turn%2 === 0 && $(this).attr('data-side') === 'light') {
+				$(this).attr('data','active');
+				$(this).addClass('active');
+				activeCounter = 1;
+				var figure = window[$(this).attr('name')];
+				moves = figure.checkFields(event);
+				for (var i = 0; i < moves.length; i++) {
+					$(moves[i]).addClass('possibleMove');
+				}
+			}
+
  		} else if ($(this).attr('data') === 'active') {
+
  			$(this).removeAttr('data','active');
  			$(this).removeClass('active');
  			$('td').removeClass('possibleMove');
  			activeCounter = 0;
+
  		}
  	});
 }		
@@ -321,6 +337,7 @@ function move() {
 			if(typeof($(target).attr('data-firstMove')) != undefined) {
 				$(target).attr('data-firstMove',1);
 			}
+			turn++;
 		} else if ($(this).html().length !== 0 && $(this).attr('data-side') !== activeFigure.attr('data-side') && moves.indexOf('#' + target.id) > -1) {
 			$('#' + target.id).html(activeFigure.html());
 			$('#' + target.id).attr('name', activeFigure.attr('name'));
@@ -334,6 +351,7 @@ function move() {
 			if(typeof(target.attr('data-firstMove')) != undefined) {
 				target.attr('data-firstMove') = 1;
 			}
+			turn++;
 		}
 	});
 }
@@ -367,10 +385,10 @@ function pushPossibleMove(array,target,possibleMoves,columOrRow,number){
 }
 
 $(document).ready(function(){
-
 	createDesk();
 	createSolders();
 	selectSolder();
 	move();
+	console.log(turn);
 
 });
