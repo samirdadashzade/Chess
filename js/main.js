@@ -37,10 +37,10 @@ function createSideBar() {
 	var tablo = document.createElement('div');
 	$(tablo).addClass('tablo');
 	if (turn%2 === 0) {
-		$(tablo).html('Whites turn');
+		$(tablo).html("White's turn");
 	} 
 	if (turn%2 != 0) {
-		$(tablo).html('Blacks turn');
+		$(tablo).html("Black's turn");
 	}
 	$('#left-side').append(tablo);
 
@@ -240,13 +240,17 @@ function createSolders() {
 			}
 			if (target.attr('data-side') === 'dark') {
 				for(var i = 1; i < moveRange; i++) {
-					possibleMoves.push('#'+ (row - i) + colums[colum]);
+					var cell = '#'+ (row - i) + colums[colum];
+					if ($(cell).html().length != 0) {break;}	
+					possibleMoves.push(cell);
 				}
 				var rightField = '#' + (row - 1) + colums[colum + 1];
 				var leftField = '#' + (row - 1) + colums[colum - 1];
 			} else if (target.attr('data-side') === 'light') {
 				for(var i = 1; i < moveRange; i++) {
-					possibleMoves.push('#'+ (row + i) + colums[colum]);
+					var cell = '#'+ (row + i) + colums[colum];
+					if ($(cell).html().length != 0) {break;}	
+					possibleMoves.push(cell);
 				}
 				var rightField = '#' + (row + 1) + colums[colum + 1];
 				var leftField = '#' + (row + 1) + colums[colum - 1];
