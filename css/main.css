@@ -1,9 +1,13 @@
+body {
+	width: 1000px;
+	margin: 0 auto;
+}
 
-table {
+#chessDesk {
 	width: 700px;
 	height: 700px;
-	margin: 0 auto;
 	border: 1px solid #ccc;
+	float: left;
 }
 
 .white, .black {
@@ -15,7 +19,7 @@ table {
 	background-color: #ccc;
 }
 
-td {
+#chessDesk td {
 	font-size: 50px;
 	text-align: center;
 	align-items: center;
@@ -33,4 +37,17 @@ td {
 .possibleMove {
 	background-color: #2DBB28;
 	opacity: 0.5;
+}
+
+#left-side {
+	width: 296px;
+	height: 700px;
+	float: right;
+	border: 2px solid black;
+}
+
+.tablo {
+	text-align: center;
+	padding: 10px;
+	font-weight: bold;
 }

@@ -1,4 +1,5 @@
 // Taxt yaradilir
+
 function createDesk() {
 
 	rows = [8,7,6,5,4,3,2,1];
@@ -27,6 +28,22 @@ function createDesk() {
 		$(td).attr('id', rows[i] + colums[x]);
 		$(rowId).append(td);
 	}}
+
+}
+
+function createSideBar() {
+
+	$('.tablo').remove();
+	var tablo = document.createElement('div');
+	$(tablo).addClass('tablo');
+	if (turn%2 === 0) {
+		$(tablo).html('Whites turn');
+	} 
+	if (turn%2 != 0) {
+		$(tablo).html('Blacks turn');
+	}
+	$('#left-side').append(tablo);
+
 }
 
 // Object olaraq figurlar formallashdirilir ve taxta yazilir, her figurun oz checkFields metodu olmalidi
@@ -338,6 +355,7 @@ function move() {
 				$(target).attr('data-firstMove',1);
 			}
 			turn++;
+			createSideBar();
 		} else if ($(this).html().length !== 0 && $(this).attr('data-side') !== activeFigure.attr('data-side') && moves.indexOf('#' + target.id) > -1) {
 			$('#' + target.id).html(activeFigure.html());
 			$('#' + target.id).attr('name', activeFigure.attr('name'));
@@ -348,10 +366,11 @@ function move() {
 			$(activeFigure).empty();
 			$('td').removeClass('possibleMove');
 			activeCounter = 0;
-			if(typeof(target.attr('data-firstMove')) != undefined) {
-				target.attr('data-firstMove') = 1;
+			if($(target).attr('data-firstMove')) {
+				$(target).attr('data-firstMove', 1);
 			}
 			turn++;
+			createSideBar();
 		}
 	});
 }
@@ -386,6 +405,7 @@ function pushPossibleMove(array,target,possibleMoves,columOrRow,number){
 
 $(document).ready(function(){
 	createDesk();
+	createSideBar();
 	createSolders();
 	selectSolder();
 	move();
