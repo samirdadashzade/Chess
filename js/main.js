@@ -241,7 +241,7 @@ function createSolders() {
 			if (target.attr('data-side') === 'dark') {
 				for(var i = 1; i < moveRange; i++) {
 					var cell = '#'+ (row - i) + colums[colum];
-					if ($(cell).html().length != 0) {break;}	
+					if ($(cell).html().length != 0) {break;}
 					possibleMoves.push(cell);
 				}
 				var rightField = '#' + (row - 1) + colums[colum + 1];
@@ -249,7 +249,7 @@ function createSolders() {
 			} else if (target.attr('data-side') === 'light') {
 				for(var i = 1; i < moveRange; i++) {
 					var cell = '#'+ (row + i) + colums[colum];
-					if ($(cell).html().length != 0) {break;}	
+					if ($(cell).html().length != 0) {break;}
 					possibleMoves.push(cell);
 				}
 				var rightField = '#' + (row + 1) + colums[colum + 1];
@@ -348,16 +348,21 @@ function move() {
 			$('#' + target.id).html(activeFigure.html());
 			$('#' + target.id).attr('name', activeFigure.attr('name'));
 			$('#' + target.id).attr('data-side', activeFigure.attr('data-side'));
+			if($(activeFigure).attr('data-firstMove') == 0) {
+				$(target).attr('data-firstMove', 1);
+			} else if ($(activeFigure).attr('data-firstMove')) {
+				$(target).attr('data-firstMove', $(activeFigure).attr('data-firstMove'));
+			}
 			activeFigure.removeClass('active');
 			activeFigure.removeAttr('data-side');
+			activeFigure.removeAttr('data-firstMove');
 			activeFigure.removeAttr('data','active');
 			activeFigure.removeAttr('name');
-			$(activeFigure).empty();
+			// $(activeFigure).empty();
 			$('td').removeClass('possibleMove');
 			activeCounter = 0;
-			if(typeof($(target).attr('data-firstMove')) != undefined) {
-				$(target).attr('data-firstMove',1);
-			}
+			
+			$(activeFigure).empty();
 			turn++;
 			console.log('Top func');
 			createSideBar();
@@ -365,15 +370,21 @@ function move() {
 			$('#' + target.id).html(activeFigure.html());
 			$('#' + target.id).attr('name', activeFigure.attr('name'));
 			$('#' + target.id).attr('data-side', activeFigure.attr('data-side'));
+			if($(activeFigure).attr('data-firstMove') == 0) {
+				$(target).attr('data-firstMove', 1);
+			} else if ($(activeFigure).attr('data-firstMove')) {
+				$(target).attr('data-firstMove', $(activeFigure).attr('data-firstMove'));
+			}
 			activeFigure.removeClass('active');
+			activeFigure.removeAttr('data-firstMove');
+			activeFigure.removeAttr('data-side');
 			activeFigure.removeAttr('data','active');
 			activeFigure.removeAttr('name');
-			$(activeFigure).empty();
+			// $(activeFigure).empty();
 			$('td').removeClass('possibleMove');
 			activeCounter = 0;
-			if($(target).attr('data-firstMove')) {
-				$(target).attr('data-firstMove', 1);
-			}
+			
+			$(activeFigure).empty();
 			turn++;
 			console.log('bottom func');
 			createSideBar();
