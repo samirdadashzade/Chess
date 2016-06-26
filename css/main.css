@@ -59,7 +59,7 @@ body {
 	height: 300px;
 	margin-top: 0px;
 	padding: 0px;
-	overflow: scroll;
+	overflow-y: scroll;
 }
 
 .log li {

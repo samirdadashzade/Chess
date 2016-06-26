@@ -50,7 +50,7 @@ function createSideBar() {
 	$(history).addClass('log');
 	$('#left-side').append(history);
 	for (var i = 0; i < log.length; i++) {
-		$('.log').append(log[i]);
+		$('.log').prepend(log[i]);
 	}
 
 }
@@ -389,7 +389,6 @@ function move() {
 			$(target).attr('name') + ' moved from ' + $(activeFigure).attr('id') + ' to ' + $(target).attr('id') + ' at ' + currentTime + '</li>';
 			
 			log.push(newMove);
-			console.log(log);
 			createSideBar();
 		}
 	});
