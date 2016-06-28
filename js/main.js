@@ -53,6 +53,27 @@ function createSideBar() {
 		$('.log').prepend(log[i]);
 	}
 
+	$('.reset').remove();
+	var reset = document.createElement('button');
+	$(reset).addClass('reset');
+	$(reset).html('Restart game');
+	$(reset).attr('onclick', 'resetGame()');
+	$('#left-side').append(reset);
+
+}
+
+function resetGame() {
+	var danger = confirm('Worning, you will lose your progress');
+
+	if (danger) {
+		var solders = $('#chessDesk').find('td');
+		for (var i = 0; i < solders.length; i++ ) {
+			$('#' + solders[i].id).empty();
+		}
+		log = [];
+		createSolders();
+		createSideBar();
+	}
 }
 
 // Object olaraq figurlar formallashdirilir ve taxta yazilir, her figurun oz checkFields metodu olmalidi
