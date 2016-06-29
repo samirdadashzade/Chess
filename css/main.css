@@ -31,11 +31,11 @@ body {
 }
 
 .active {
-	background-color: #2DBB28;
+	box-shadow: 0 0 20px 5px green inset;
 }
 
 .possibleMove {
-	background-color: #2DBB28;
+	box-shadow: 0 0 20px 5px #2DBB28 inset;
 	opacity: 0.5;
 }
 
@@ -70,4 +70,20 @@ body {
 
 .reset {
 	width: 100%;
+}
+.deathSolders li {
+	list-style: none;
+}
+.darks {
+	float: left;
+	/*border: 1px solid black;*/
+	text-align: center;
+	height: 50px;
+}
+.lights {
+	float: right;
+	margin-right: 40px;
+	/*border: 1px solid black;*/
+	text-align: center;
+	height: 50px;
 }

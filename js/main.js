@@ -6,6 +6,8 @@ function createDesk() {
 	colums = ['a','b','c','d','e','f','g','h'];
 	turn = 0;
 	log = [];
+	darkSolders = [];
+	lightSolders = [];
 
 	for (i = 0; i < rows.length; i++) {
 	 	var tr = document.createElement('tr');
@@ -29,7 +31,14 @@ function createDesk() {
 		$(td).attr('id', rows[i] + colums[x]);
 		$(rowId).append(td);
 	}}
+}
 
+function solderDead(figureCode, side) {
+	if (side === 'darks') {
+		darkSolders.push(figureCode);
+	} else if (side === 'lights') {
+		lightSolders.push(figureCode);
+	} 
 }
 
 function createSideBar() {
@@ -59,6 +68,32 @@ function createSideBar() {
 	$(reset).html('Restart game');
 	$(reset).attr('onclick', 'resetGame()');
 	$('#left-side').append(reset);
+
+	$('.darks').remove();
+	$('.lights').remove();
+	$('.deathSolders').remove();
+
+	var deathSolders =document.createElement('div');
+	$(deathSolders).addClass('deathSolders');
+	$('#left-side').append(deathSolders);
+
+	var darks = document.createElement('ul');
+	$(darks).addClass('darks');
+	var lights = document.createElement('ul');
+	$(lights).addClass('lights');
+	$('.deathSolders').append(darks, lights);
+	$('.darks').append('<li>Black solders</li>');
+	$('.lights').append('<li>White solders</li>');
+	
+	for (var i = 0; i < darkSolders.length; i++) {
+		$('.darks').append('<li>' + darkSolders[i] + '</li>');
+	} 
+
+	for (var i = 0; i < lightSolders.length; i++) {
+		$('.lights').append('<li>' + lightSolders[i] + '</li>');
+	} 
+	
+
 
 }
 
@@ -382,9 +417,13 @@ function move() {
 			$(target).attr('name') + ' moved from ' + $(activeFigure).attr('id') + ' to ' + $(target).attr('id') + ' at ' + currentTime + '</li>';
 			
 			log.push(newMove);
-			console.log(log);
 			createSideBar();
 		} else if ($(this).html().length !== 0 && activeFigure.length > 0 && $(this).attr('data-side') !== activeFigure.attr('data-side') && moves.indexOf('#' + target.id) > -1) {
+			if ($(target).attr('data-side') === 'dark') {
+				solderDead(target.innerHTML, 'darks'); 
+			} else if ($(target).attr('data-side') === 'light') {
+				solderDead(target.innerHTML, 'lights'); 
+			}
 			$('#' + target.id).html(activeFigure.html());
 			$('#' + target.id).attr('name', activeFigure.attr('name'));
 			$('#' + target.id).attr('data-side', activeFigure.attr('data-side'));
@@ -401,7 +440,6 @@ function move() {
 			$(activeFigure).empty();
 			$('td').removeClass('possibleMove');
 			activeCounter = 0;
-			
 			$(activeFigure).empty();
 			turn++;
 			var t = new Date();
@@ -470,6 +508,5 @@ $(document).ready(function(){
 	createSolders();
 	selectSolder();
 	move();
-	console.log(turn);
 
 });
