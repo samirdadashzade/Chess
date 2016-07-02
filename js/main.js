@@ -83,6 +83,7 @@ Board = {
 		} 
 	},
 	rewriteField: function(target, activeFigure) {
+
 		$('#' + target.id).html(activeFigure.html());
 		$('#' + target.id).attr('name', activeFigure.attr('name'));
 		$('#' + target.id).attr('data-side', activeFigure.attr('data-side'));
@@ -100,6 +101,10 @@ Board = {
 		$('td').removeClass('possibleMove');
 		activeCounter = 0;
 
+		if ($(target).attr('name') === 'pawn') {
+			Soldiers.pawn.promotion(target);
+		}
+
 		Board.turn++;
 		var t = new Date();
 		var currentTime = t.getHours() + ':' + t.getMinutes() + ':' + t.getSeconds();
@@ -107,6 +112,7 @@ Board = {
 		$(target).attr('name') + ' moved from ' + $(activeFigure).attr('id') + ' to ' + $(target).attr('id') + ' at ' + currentTime + '</li>';
 		Board.log.push(newMove);
 		Board.createSideBar();
+
 	}
 }
 
@@ -425,6 +431,39 @@ Soldiers = {
 			}
 
 			return possibleMoves;
+		},
+		promotion: function(target) {
+			var fieldData = target.id.split('');
+			var row = Number(fieldData[0]);
+			var side = $('#' + target.id).attr('data-side');
+			console.log(row, side);
+			if ((row === 8 && side === 'light') || (row === 1 && side === 'dark')) {
+				var confirmPromotion = confirm('Do you wont to promote your pawn?');
+				if (confirmPromotion) {
+					var userChoice = prompt('Please write figure you wont replace with - "Rook", "Knight", "Bishop", "King"');
+					switch(userChoice) {
+						case ('Rook'):
+						var replacePawn = 'rook';
+						break; 
+						case ('Knight'):
+						var replacePawn = 'knight';
+						break;
+						case ('Bishop'):
+						var replacePawn = 'bishop';
+						break;
+						case ('King'):
+						var replacePawn = 'king';
+						break;
+					}
+					if (side === 'light') {
+						$('#' + target.id).html(Soldiers[replacePawn].white);
+					} else if (side === 'dark') {
+						$('#' + target.id).html(Soldiers[replacePawn].black);
+					}
+					$('#' + target.id).removeAttr('data-firstMove');
+					$('#' + target.id).attr('name', replacePawn);
+				}
+			} 
 		}
 	},
 	createSoldiers: function() {
