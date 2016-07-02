@@ -1,4 +1,4 @@
-// Game board object
+// Board object
 Board = {
 
 	// General Data
@@ -81,8 +81,33 @@ Board = {
 		for (var i = 0; i < this.killedLights.length; i++) {
 			$('.lights').append('<li>' + this.killedLights[i] + '</li>');
 		} 
-	}
+	},
+	rewriteField: function(target, activeFigure) {
+		$('#' + target.id).html(activeFigure.html());
+		$('#' + target.id).attr('name', activeFigure.attr('name'));
+		$('#' + target.id).attr('data-side', activeFigure.attr('data-side'));
+		if($(activeFigure).attr('data-firstMove') == 0) {
+			$(target).attr('data-firstMove', 1);
+		} else if ($(activeFigure).attr('data-firstMove')) {
+			$(target).attr('data-firstMove', $(activeFigure).attr('data-firstMove'));
+		}
+		activeFigure.removeClass('active');
+		activeFigure.removeAttr('data-firstMove');
+		activeFigure.removeAttr('data-side');
+		activeFigure.removeAttr('data','active');
+		activeFigure.removeAttr('name');
+		$(activeFigure).empty();
+		$('td').removeClass('possibleMove');
+		activeCounter = 0;
 
+		Board.turn++;
+		var t = new Date();
+		var currentTime = t.getHours() + ':' + t.getMinutes() + ':' + t.getSeconds();
+		var newMove = '<li class="' + $(target).attr('data-side') + '">['+ $(target).attr('data-side') + 's] : ' + 
+		$(target).attr('name') + ' moved from ' + $(activeFigure).attr('id') + ' to ' + $(target).attr('id') + ' at ' + currentTime + '</li>';
+		Board.log.push(newMove);
+		Board.createSideBar();
+	}
 }
 
 // Game object
@@ -129,6 +154,7 @@ Game = {
 			figureMoves.forEach(function(entry){
 				if ($(entry).attr('name') === 'queen' && $(entry).attr('data-side') != $('#' + solders[i].id).attr('data-side')) {
 					queenKiller.push(solders[i]);
+					console.log(queenKiller);
 				}
 			}); 
 		}
@@ -347,14 +373,14 @@ Soldiers = {
 			var downMoves = Board.rows.slice($.inArray(row, Board.rows) + 1);
 			var leftMoves = Board.colums.slice(0, colum).reverse();
 			var rightMoves = Board.colums.slice(colum + 1);
-			rookPushMove(upMoves, target, possibleMoves,'colum', colum);
-			rookPushMove(downMoves, target, possibleMoves,'colum', colum);
-			rookPushMove(leftMoves, target, possibleMoves,'row', row);
-			rookPushMove(rightMoves, target, possibleMoves,'row',row);
-			bishopPushMove(upMoves, target, possibleMoves,row, colum, 'left');
-			bishopPushMove(upMoves, target, possibleMoves,row, colum, 'right');
-			bishopPushMove(downMoves, target, possibleMoves,row, colum, 'left');
-			bishopPushMove(downMoves, target, possibleMoves,row, colum, 'right');
+			Soldiers.rook.rookPushMove(upMoves, target, possibleMoves,'colum', colum);
+			Soldiers.rook.rookPushMove(downMoves, target, possibleMoves,'colum', colum);
+			Soldiers.rook.rookPushMove(leftMoves, target, possibleMoves,'row', row);
+			Soldiers.rook.rookPushMove(rightMoves, target, possibleMoves,'row',row);
+			Soldiers.bishop.bishopPushMove(upMoves, target, possibleMoves,row, colum, 'left');
+			Soldiers.bishop.bishopPushMove(upMoves, target, possibleMoves,row, colum, 'right');
+			Soldiers.bishop.bishopPushMove(downMoves, target, possibleMoves,row, colum, 'left');
+			Soldiers.bishop.bishopPushMove(downMoves, target, possibleMoves,row, colum, 'right');
 			return possibleMoves;
 		}
 	},
@@ -471,72 +497,19 @@ Soldiers = {
 			clickCounter = 1;
 			var activeFigure = $('#chessDesk').find('[data="active"]');
 
-	 		if (activeFigure.length > 0 && clickCounter === 1 && $(target).html().length === 0 && moves.indexOf('#' + target.id) > -1) {
-	 			$('#' + target.id).html(activeFigure.html());
-	 			$('#' + target.id).attr('name', activeFigure.attr('name'));
-	 			$('#' + target.id).attr('data-side', activeFigure.attr('data-side'));
-	 			if($(activeFigure).attr('data-firstMove') == 0) {
-	 				$(target).attr('data-firstMove', 1);
-	 			} else if ($(activeFigure).attr('data-firstMove')) {
-	 				$(target).attr('data-firstMove', $(activeFigure).attr('data-firstMove'));
-	 			}
-	 			activeFigure.removeClass('active');
-	 			activeFigure.removeAttr('data-side');
-	 			activeFigure.removeAttr('data-firstMove');
-	 			activeFigure.removeAttr('data','active');
-	 			activeFigure.removeAttr('name');
-	 			$(activeFigure).empty();
-	 			$('td').removeClass('possibleMove');
-	 			activeCounter = 0;
-	 			// // ------- CheckMate ---------
-	 			// allSolders($(target).attr('data-side'), 'enemy');
-	 			// checkmate(allSolders($(target).attr('data-side'), 'friend'), event);
-	 			// // ------- CheckMate ---------
-	 			Board.turn++;
-	 			var t = new Date();
-	 			var currentTime = t.getHours() + ':' + t.getMinutes() + ':' + t.getSeconds();
-	 			var newMove = '<li class="' + $(target).attr('data-side') + '">['+ $(target).attr('data-side') + 's] : ' + 
-	 			$(target).attr('name') + ' moved from ' + $(activeFigure).attr('id') + ' to ' + $(target).attr('id') + ' at ' + currentTime + '</li>';
-	 			
-	 			Board.log.push(newMove);
-	 			Board.createSideBar();
+			if (activeFigure.length > 0 && clickCounter === 1 && $(target).html().length === 0 && moves.indexOf('#' + target.id) > -1) {
+				
+				Board.rewriteField(target, activeFigure);
 
-	 		} else if (activeFigure.length > 0 && $(target).html().length !== 0 && $(target).attr('data-side') !== activeFigure.attr('data-side') && moves.indexOf('#' + target.id) > -1) {
-	 			
-	 			if ($(target).attr('data-side') === 'dark') {
-	 				Game.solderDead(target.innerHTML, 'darks'); 
-	 			} else if ($(target).attr('data-side') === 'light') {
-	 				Game.solderDead(target.innerHTML, 'lights'); 
-	 			}
+			} else if (activeFigure.length > 0 && $(target).html().length !== 0 && $(target).attr('data-side') !== activeFigure.attr('data-side') && moves.indexOf('#' + target.id) > -1) {
+				
+				if ($(target).attr('data-side') === 'dark') {
+					Game.solderDead(target.innerHTML, 'darks'); 
+				} else if ($(target).attr('data-side') === 'light') {
+					Game.solderDead(target.innerHTML, 'lights'); 
+				}
 
-	 			$('#' + target.id).html(activeFigure.html());
-	 			$('#' + target.id).attr('name', activeFigure.attr('name'));
-	 			$('#' + target.id).attr('data-side', activeFigure.attr('data-side'));
-	 			if($(activeFigure).attr('data-firstMove') == 0) {
-	 				$(target).attr('data-firstMove', 1);
-	 			} else if ($(activeFigure).attr('data-firstMove')) {
-	 				$(target).attr('data-firstMove', $(activeFigure).attr('data-firstMove'));
-	 			}
-	 			activeFigure.removeClass('active');
-	 			activeFigure.removeAttr('data-firstMove');
-	 			activeFigure.removeAttr('data-side');
-	 			activeFigure.removeAttr('data','active');
-	 			activeFigure.removeAttr('name');
-	 			$(activeFigure).empty();
-	 			$('td').removeClass('possibleMove');
-	 			activeCounter = 0;
-	 			// // ------- CheckMate ---------
-	 			// allSolders($(target).attr('data-side'), 'enemy');
-	 			// checkmate(allSolders($(target).attr('data-side'), 'friend'), event);
-	 			// // ------- CheckMate ---------
-	 			Board.turn++;
-	 			var t = new Date();
-	 			var currentTime = t.getHours() + ':' + t.getMinutes() + ':' + t.getSeconds();
-	 			var newMove = '<li class="' + $(target).attr('data-side') + '">['+ $(target).attr('data-side') + 's] : ' + 
-	 			$(target).attr('name') + ' moved from ' + $(activeFigure).attr('id') + ' to ' + $(target).attr('id') + ' at ' + currentTime + '</li>';
-	 			
-	 			Board.log.push(newMove);
-	 			Board.createSideBar();
+	 			Board.rewriteField(target, activeFigure);
 	 		}
 	 	});
 	}		
