@@ -42,10 +42,10 @@ Board = {
 		// Show turn
 		$('#turn').empty();
 		var turnHeader = document.getElementById('#turn');
-		if (turn % 2 === 0) {
+		if (this.turn % 2 === 0) {
 			$(turnHeader).html("White's turn");
 		} 
-		if (turn % 2 != 0) {
+		if (this.turn % 2 != 0) {
 			$(turnHeader).html("Black's turn");
 		}
 		// Show log
@@ -113,14 +113,15 @@ Board = {
 		Board.log.push(newMove);
 		Board.createSideBar();
 	},
-	select: function(target, event) {
+	select: function(event) {
+		var target = event.target;
 		$(target).attr('data','active');
-			$(target).addClass('active');
-			activeCounter = 1;
-			var figure = $(target).attr('name');
-			moves = Soldiers[figure].checkFields(event);
-			for (var i = 0; i < moves.length; i++) {
-				$(moves[i]).addClass('possibleMove');
+		$(target).addClass('active');
+		activeCounter = 1;
+		var figure = $(target).attr('name');
+		moves = Soldiers[figure].checkFields(event);
+		for (var i = 0; i < moves.length; i++) {
+			$(moves[i]).addClass('possibleMove');
 		}
 	}
 }
@@ -161,17 +162,45 @@ Game = {
 			return true;
 		}
 	},
-	checkmate: function(solders, event) {
-		queenKiller = [];
-		for( var i = 0; i < solders.length; i++) {
-			var figure = $('#' + solders[i].id).attr('name');
-			figureMoves = Soldiers[figure].checkFields(event);
-			figureMoves.forEach(function(entry){
-				if ($(entry).attr('name') === 'queen' && $(entry).attr('data-side') != $('#' + solders[i].id).attr('data-side')) {
-					// queenKiller.push(solders[i]);
-					console.log(entry);
+	checkmate: function(enemies, friends) {
+		queenKillers = [];
+		queenHelpers = [];
+		queen = undefined;
+		// Enemies
+		for( var i = 0; i < enemies.length; i++) {
+			var enemyFigure = $('#' + enemies[i].id).attr('name');
+			var enemyFieldData = document.getElementById(enemies[i].id);
+			enemyFigureMoves = Soldiers[enemyFigure].checkFields(undefined, enemyFieldData);
+			enemyFigureMoves.forEach(function(entry){
+				if ($(entry).attr('name') === 'queen' && $(entry).attr('data-side') != $('#' + enemies[i].id).attr('data-side')) {
+					queenKillers.push(enemies[i]);
+					queen = $(entry);
 				}
 			}); 
+		}
+		if (queenKillers.length > 0) {
+			// Friends
+			for( var i = 0; i < friends.length; i++) {
+				var friendFigure = $('#' + friends[i].id).attr('name');
+				var friendFieldData = document.getElementById(friends[i].id);
+				friendFigureMoves = Soldiers[friendFigure].checkFields(undefined, friendFieldData);
+				friendFigureMoves.forEach(function(entry){
+					for (var x = 0; x < queenKillers.length; x++) {
+						if (entry === ('#' + $(queenKillers[x]).attr('id'))) {
+							queenHelpers.push(friends[i]);
+						}
+					}
+				}); 
+			}
+		}
+		// Check if queen can move
+		if (queen != undefined) {
+			var queenTarget = document.getElementById($(queen).attr('id'));
+			var queenMoves = Soldiers[$(queen).attr('name')].checkFields(undefined, queenTarget);
+			// if queen cant move and where are no queenHelpers
+			if (queenMoves.length === 0 && queenHelpers.length === 0) {
+				console.log('checkmate');
+			}
 		}
 	},
 	allSoldiers: function(side, rel) {
@@ -205,8 +234,13 @@ Soldiers = {
 		name: 'rook',
 		black: '&#9820',
 		white: '&#9814',
-		checkFields: function(event) {
-			var target = $(event.target);
+		checkFields: function(event, field) {
+			if (event === undefined) {
+				var target = field;
+				var target = $(target);
+			} else {
+				var target = $(event.target);
+			}
 			var fieldData = target.attr('id').split('');
 			var row = Number(fieldData[0]);
 			var colum = Board.colums.indexOf(fieldData[1]);
@@ -237,14 +271,22 @@ Soldiers = {
 					break;
 				}
 			};
+		},
+		saveQueen: function(soldierPosition, queenPosition, enemyPosition) {
+
 		}
 	},
 	knight: {
 		name: 'knight',
 		black: '&#9822',
 		white: '&#9816',
-		checkFields: function(event) {
-			var target = $(event.target);
+		checkFields: function(event, field) {
+			if (event === undefined) {
+				var target = field;
+				var target = $(target);
+			} else {
+				var target = $(event.target);
+			}
 			var fieldData = target.attr('id').split('');
 			var row = Number(fieldData[0]);
 			var colum = Board.colums.indexOf(fieldData[1]);
@@ -291,8 +333,13 @@ Soldiers = {
 		name: 'bishop',
 		black: '&#9821',
 		white: '&#9815',
-		checkFields: function(event) {
-			var target = $(event.target);
+		checkFields: function(event, field) {
+			if (event === undefined) {
+				var target = field;
+				var target = $(target);
+			} else {
+				var target = $(event.target);
+			}
 			var fieldData = target.attr('id').split('');
 			var row = Number(fieldData[0]);
 			var colum = Board.colums.indexOf(fieldData[1]);
@@ -331,8 +378,13 @@ Soldiers = {
 		name: 'queen',
 		black: '&#9818',
 		white: '&#9812',
-		checkFields: function(event) {
-			var target = $(event.target);
+		checkFields: function(event, field) {
+			if (event === undefined) {
+				var target = field;
+				var target = $(target);
+			} else {
+				var target = $(event.target);
+			}
 			var fieldData = target.attr('id').split('');
 			var row = Number(fieldData[0]);
 			var colum = Board.colums.indexOf(fieldData[1]);
@@ -378,8 +430,13 @@ Soldiers = {
 		name: 'king',
 		black: '&#9819',
 		white: '&#9813',
-		checkFields: function(event) {
-			var target = $(event.target);
+			checkFields: function(event, field) {
+			if (event === undefined) {
+				var target = field;
+				var target = $(target);
+			} else {
+				var target = $(event.target);
+			}
 			var fieldData = target.attr('id').split('');
 			var row = Number(fieldData[0]);
 			var colum = Board.colums.indexOf(fieldData[1]);
@@ -403,8 +460,13 @@ Soldiers = {
 		name: 'pawn',
 		black: '&#9823',
 		white: '&#9817',
-		checkFields: function(event) {
-			var target = $(event.target);
+		checkFields: function(event, field) {
+			if (event === undefined) {
+				var target = field;
+				var target = $(target);
+			} else {
+				var target = $(event.target);
+			}
 			var fieldData = target.attr('id').split('');
 			var row = Number(fieldData[0]);
 			var colum = Board.colums.indexOf(fieldData[1]);
@@ -445,7 +507,6 @@ Soldiers = {
 			var fieldData = target.id.split('');
 			var row = Number(fieldData[0]);
 			var side = $('#' + target.id).attr('data-side');
-			console.log(row, side);
 			if ((row === 8 && side === 'light') || (row === 1 && side === 'dark')) {
 				var confirmPromotion = confirm('Do you wont to promote your pawn?');
 				if (confirmPromotion) {
@@ -507,9 +568,9 @@ Soldiers = {
 			if ($(target).html().length > 0 && $(target).attr('data') !== 'active' && activeCounter === 0) {
 
 				if (Board.turn % 2 != 0 && $(target).attr('data-side') === 'dark') {
-					Board.select(target, event);
+					Board.select(event);
 				} else if (Board.turn % 2 === 0 && $(target).attr('data-side') === 'light') {
-					Board.select(target, event);
+					Board.select(event);
 				}
 
 			} else if ($(target).attr('data') === 'active') {
@@ -534,10 +595,9 @@ Soldiers = {
 			if (activeFigure.length > 0 && clickCounter === 1 && $(target).html().length === 0 && moves.indexOf('#' + target.id) > -1) {
 				
 				Board.rewriteField(target, activeFigure);
-				var soldiers = Game.allSoldiers($('#' + target.id).attr('data-side'),'friend'); 
-				Game.checkmate(soldiers, event);
-				// console.log(soldiers);
-
+				var enemies = Game.allSoldiers($('#' + target.id).attr('data-side'),'friend'); 
+				var friends = Game.allSoldiers($('#' + target.id).attr('data-side'),'enemy'); 
+				Game.checkmate(enemies, friends);
 			} else if (activeFigure.length > 0 && $(target).html().length !== 0 && $(target).attr('data-side') !== activeFigure.attr('data-side') && moves.indexOf('#' + target.id) > -1) {
 				
 				if ($(target).attr('data-side') === 'dark') {
@@ -547,9 +607,9 @@ Soldiers = {
 				}
 
 				Board.rewriteField(target, activeFigure);
-				var soldiers = Game.allSoldiers($('#' + target.id).attr('data-side'),'friend'); 
-				Game.checkmate(soldiers, event);
-				// console.log(soldiers);
+				var enemies = Game.allSoldiers($('#' + target.id).attr('data-side'),'friend'); 
+				var friends = Game.allSoldiers($('#' + target.id).attr('data-side'),'enemy'); 
+				Game.checkmate(enemies, friends);
 
 	 		}
 	 	});
