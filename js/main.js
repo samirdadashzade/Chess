@@ -92,6 +92,26 @@ Board = {
 		} else if ($(activeFigure).attr('data-firstMove')) {
 			$(target).attr('data-firstMove', $(activeFigure).attr('data-firstMove'));
 		}
+
+		if ($(activeFigure).attr('name') == 'queen') {
+			//if queen is playing check that if it moves 2 cells right or left
+			var kingCol=Board.colums.indexOf($(activeFigure).attr('id').split('')[1]);
+			var targetCol=Board.colums.indexOf($(target).attr('id').split('')[1]);
+			var diff = kingCol-targetCol;
+			var castlingRook=$('#chessDesk').find('[data-castling=1]');
+			if(diff==2){
+				//left castling
+				var kingLeftCell=$(activeFigure).prev()[0];
+				Board.rewriteField(kingLeftCell,castlingRook);
+			}else if(diff==-2){
+				//right castling
+				var kingRightCell=$(activeFigure).next()[0];
+				Board.rewriteField(kingRightCell,castlingRook);	
+			}
+			Board.turn++;	
+			$('#chessDesk').find('[data-castling=1]').removeAttr('data-castling');
+		}
+
 		activeFigure.removeClass('active');
 		activeFigure.removeAttr('data-firstMove');
 		activeFigure.removeAttr('data-side');
@@ -391,25 +411,18 @@ Soldiers = {
 			var possibleMoves = [];
 			var addRow = 1;;
 			for (var i = 1; i <= 2; i++) {
-				if((row + addRow) > 0 && (row + addRow) <= 8 && Board.colums[colum] != undefined) { 
-					var cell= '#' + (row + addRow) + Board.colums[colum];
-					if(Game.checkType(target, cell) == null || Game.checkType(target, cell) == true ) {
-						possibleMoves.push(cell);
-					}
-				}
-				if((row + addRow) > 0 && (row + addRow) <= 8 && Board.colums[colum + 1] != undefined){
-					var cell = '#' + (row + addRow) + Board.colums[colum + 1];
-					if(Game.checkType(target, cell) == null || Game.checkType(target, cell) == true ) {
-						possibleMoves.push(cell);
-					}
-				}
-				if((row + addRow) > 0 && (row + addRow) <= 8 && Board.colums[colum - 1] != undefined){
-					var cell = '#' + (row + addRow) + Board.colums[colum - 1];
-					if(Game.checkType(target, cell) == null || Game.checkType(target,cell) == true ) {
-						possibleMoves.push(cell);
-					}
-				}
+				kingRow(colum);
+				kingRow(colum+1);
+				kingRow(colum-1);
 				addRow =- 1;
+			}
+			function kingRow(columIndex){
+				if((row + addRow) > 0 && (row + addRow) <= 8 && Board.colums[columIndex] != undefined) { 
+					var cell= '#' + (row + addRow) + Board.colums[columIndex];
+					if(Game.checkType(target, cell) == null || Game.checkType(target, cell) == true ) {
+						possibleMoves.push(cell);
+					}
+				}
 			}
 			if(Board.colums[colum - 1] != undefined) {
 				var cell = '#' + row + Board.colums[colum - 1];
@@ -422,6 +435,46 @@ Soldiers = {
 				if(Game.checkType(target,cell) == null || Game.checkType(target,cell) == true ) {
 					possibleMoves.push(cell);
 				}
+			}
+
+			if($(target).attr('data-firstMove')==0){
+				//if king's firstMove is zero get all friends
+				var friends = document.querySelectorAll('[data-side = ' + $(target).attr('data-side') + ']');
+				Array.prototype.forEach.call(friends,function(item){
+					if($(item).attr('name')=='rook' && $(item).attr('data-firstMove')==0){
+						//if any rook has firstMove==0 check if it is left rook or right rook
+						var splitted = $(item).attr('id').split('');
+						var rookColumn = Board.colums.indexOf(splitted[1]);
+						if(rookColumn<colum){
+							var leftCastling=true;
+							for(var i=1;i<=3;i++){
+								//if rook is left then check that there is no elements between them for castling
+								if($('#'+row+Board.colums[colum-i]).html()!='')
+									leftCastling=false;
+							}
+							if(leftCastling){
+								var cell='#'+row+Board.colums[colum-2];
+								//append 2 cells left of the king to possibleMoves and add that rook temporary castling attribute
+								possibleMoves.push(cell);
+								$(item).attr('data-castling',1);
+							}
+						}else{
+							// if rook is not left so it is surely right one
+							var rightCastling=true;
+							for(var i=1;i<=2;i++){
+								//check that there is no elements between rook on the right and the king for castling
+								if($('#'+row+Board.colums[colum+i]).html()!='')
+									rightCastling=false;
+							}
+							if(rightCastling){
+								var cell='#'+row+Board.colums[colum+2];
+								//append 2 cells left of the king to possibleMoves and add that rook temporary castling attribute
+								possibleMoves.push(cell);
+								$(item).attr('data-castling',1);
+							}
+						}
+					}
+				});
 			}
 			return possibleMoves;
 		}
@@ -537,26 +590,26 @@ Soldiers = {
 		}
 	},
 	createSoldiers: function() {
-		$('#8a').attr('name', this.rook.name).attr('data-side', 'dark').html(this.rook.black);
+		$('#8a').attr('name', this.rook.name).attr('data-side', 'dark').html(this.rook.black).attr('data-firstMove', 0);
 		$('#8b').attr('name', this.knight.name).attr('data-side', 'dark').html(this.knight.black);
 		$('#8c').attr('name', this.bishop.name).attr('data-side', 'dark').html(this.bishop.black);
 		$('#8d').attr('name', this.king.name).attr('data-side', 'dark').html(this.king.black);
-		$('#8e').attr('name', this.queen.name).attr('data-side', 'dark').html(this.queen.black);
+		$('#8e').attr('name', this.queen.name).attr('data-side', 'dark').html(this.queen.black).attr('data-firstMove', 0);
 		$('#8f').attr('name', this.bishop.name).attr('data-side', 'dark').html(this.bishop.black);
 		$('#8g').attr('name', this.knight.name).attr('data-side', 'dark').html(this.knight.black);
-		$('#8h').attr('name', this.rook.name).attr('data-side', 'dark').html(this.rook.black);
+		$('#8h').attr('name', this.rook.name).attr('data-side', 'dark').html(this.rook.black).attr('data-firstMove', 0);
 		for (var i = 0; i < Board.colums.length; i++) {
 			$('#7' + Board.colums[i]).attr('name', this.pawn.name).attr('data-side', 'dark').attr('data-firstMove', 0).html(this.pawn.black);
 		}
 
-		$('#1a').attr('name', this.rook.name).attr('data-side', 'light').html(this.rook.white);
+		$('#1a').attr('name', this.rook.name).attr('data-side', 'light').html(this.rook.white).attr('data-firstMove', 0);
 		$('#1b').attr('name', this.knight.name).attr('data-side', 'light').html(this.knight.white);
 		$('#1c').attr('name', this.bishop.name).attr('data-side', 'light').html(this.bishop.white);
 		$('#1d').attr('name', this.king.name).attr('data-side', 'light').html(this.king.white);
-		$('#1e').attr('name', this.queen.name).attr('data-side', 'light').html(this.queen.white);
+		$('#1e').attr('name', this.queen.name).attr('data-side', 'light').html(this.queen.white).attr('data-firstMove', 0);
 		$('#1f').attr('name', this.bishop.name).attr('data-side', 'light').html(this.bishop.white);
 		$('#1g').attr('name', this.knight.name).attr('data-side', 'light').html(this.knight.white);
-		$('#1h').attr('name', this.rook.name).attr('data-side', 'light').html(this.rook.white);
+		$('#1h').attr('name', this.rook.name).attr('data-side', 'light').html(this.rook.white).attr('data-firstMove', 0);
 		for (var i = 0; i < Board.colums.length; i++) {
 			$('#2' + Board.colums[i]).attr('name', this.pawn.name).attr('data-side', 'light').attr('data-firstMove', 0).html(this.pawn.white);
 		}
