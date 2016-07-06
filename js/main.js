@@ -245,9 +245,39 @@ Game = {
 		if (queen != undefined) {
 			var queenTarget = document.getElementById($(queen).attr('id'));
 			var queenMoves = Soldiers[$(queen).attr('name')].checkFields(undefined, queenTarget);
+			if (queenMoves.length > 0) {
+
+				// <------------------------------------------------->
+
+				// Artiq uzun mesafeden queene mat vere bilecek figurlar ucun windRose funksiyasi var, ve onlarin gedishleri 
+				// 4 (North, West, South, East) ve ya 8 (N, W, E, S, NW, NE, SW, SE ve s) hisseye bolunur, belelikle queen tehlukede olanda 
+				// asanliqla mueyyenleshdirmerk olar ki tehluke hansi terefden gelir ve onun qarshisini ala bilecek dost varmi. 
+				// Hal hazirda yazilasi kod budu: Eger queen hereket ede bilirse onceden mueyyenleshdirmek lazimdi ki belke onun 
+				// hereket zonasi ele onu vuracaq figurun/figurlarin gedish zonasindadi. Eger hele deyilse queen 
+				// tehlukesiz yere hereket ede bilirse demeli shax ve mat deyil. Yox eger beledirse, baxmaq lazimdi ona tehluke 
+				// yaradan figuru (yalniz 1 figurdan tehluke geldiyi halda) vura bilecek dost varmi, eger helesi de yoxdursa baxmaq lazimdi 
+				// en azindan dushman figurnan queen arasindaki tehluke zonasina dost hereket edib queeni block ede bilermi. Eger butun bunlar
+				// deyilse demeli shax ve matdi. 
+
+				// <------------------------------------------------->
+
+			}
 			// if queen cant move and where are no queenHelpers
 			if (queenMoves.length === 0 && queenHelpers.length === 0) {
-				console.log('checkmate');
+				for (var i = 0; i < queenKillers.length; i++) {
+					var queenKillerTarget = document.getElementById($(queenKillers[i]).attr('id'));
+					var killerName = $(queenKillers[i]).attr('name');
+					var directions = Soldiers[killerName].windRose(queenKillerTarget);
+					var terra = undefined;
+					for (var i = 0; i < directions.length; i++) {
+						for (var x = 0; x < directions[i].length; x++) {
+							var queenIndex = directions[i].indexOf('#' + $(queen).attr('id'));
+							if (queenIndex >= 0) {
+								terra = i;
+							}
+						}
+					}
+				}
 			}
 		}
 	},
