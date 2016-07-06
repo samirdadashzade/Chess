@@ -119,9 +119,29 @@ Board = {
 		$(target).addClass('active');
 		activeCounter = 1;
 		var figure = $(target).attr('name');
-		moves = Soldiers[figure].checkFields(event);
+		if (figure === 'rook') {
+			moves = Soldiers[figure].checkFields(event, undefined);
+		} else {
+			moves = Soldiers[figure].checkFields(event, undefined);
+		}
 		for (var i = 0; i < moves.length; i++) {
 			$(moves[i]).addClass('possibleMove');
+		}
+		switch (figure) {
+			case ('rook'):
+			var directions = Soldiers[figure].windRose(target);
+			break;
+			case ('bishop'):
+			var directions = Soldiers[figure].windRose(target);
+			break;
+			case ('king'):
+			var directions = Soldiers[figure].windRose(target);
+			break;
+			default:
+			break;
+		}
+		if (directions) {
+			console.log(directions);
 		}
 	}
 }
@@ -161,6 +181,34 @@ Game = {
 		} else{
 			return true;
 		}
+	},
+	windRoseDirections: function(array, target, row, colum, xy) {
+		var moves = [];
+		for (var i = 0; i < array.length; i++) {
+
+			if (xy === 'y -y') {
+				var checkCol = null;
+				var cell = '#' + array[i] + Board.colums[colum];
+			} else if (xy === 'x -x') {
+				var checkCol = null;
+				var cell = '#' +  row + array[i];
+			} else if (xy === 'y x') {
+				var checkCol = Board.colums[colum + (Math.abs(row - array[i]))];
+				if (checkCol !== undefined) {var cell = '#' + array[i] + checkCol;}
+			} else if (xy === 'y -x') {
+				var checkCol = Board.colums[colum - (Math.abs(row - array[i]))];
+				if (checkCol !== undefined) {var cell = '#' + array[i] + checkCol;}
+			}
+			if (this.checkType(target, cell) == null && checkCol !== undefined ) {
+				moves.push(cell);
+			} else if (this.checkType(target, cell) == true && checkCol !== undefined ) {
+				moves.push(cell);
+				break;
+			} else {
+				break;
+			}
+		}
+		return moves;
 	},
 	checkmate: function(enemies, friends) {
 		queenKillers = [];
@@ -241,39 +289,33 @@ Soldiers = {
 			} else {
 				var target = $(event.target);
 			}
+			var possibleMoves = [];
+			var directions = this.windRose(target);
+			directions.forEach(function(entry) {
+				for (var i = 0; i < entry.length; i++) {
+					possibleMoves.push(entry[i]);
+				}
+			});
+			return possibleMoves;
+		},
+		windRose: function(field) {
+			var target = $(field);
 			var fieldData = target.attr('id').split('');
 			var row = Number(fieldData[0]);
 			var colum = Board.colums.indexOf(fieldData[1]);
+			var upRows = Board.rows.slice(0, $.inArray(row, Board.rows)).reverse();
+			var downRows = Board.rows.slice($.inArray(row, Board.rows) + 1);
+			var leftColums = Board.colums.slice(0, colum).reverse();
+			var rightColums = Board.colums.slice(colum + 1);
 			var possibleMoves = [];
-			var upMoves = Board.rows.slice(0, $.inArray(row, Board.rows)).reverse();
-			var downMoves = Board.rows.slice($.inArray(row, Board.rows) + 1);
-			var leftMoves = Board.colums.slice(0, colum).reverse();
-			var rightMoves = Board.colums.slice(colum + 1);
-			this.rookPushMove(upMoves, target, possibleMoves, 'colum', colum);
-			this.rookPushMove(downMoves, target, possibleMoves, 'colum', colum);
-			this.rookPushMove(leftMoves, target, possibleMoves, 'row', row);
-			this.rookPushMove(rightMoves, target, possibleMoves, 'row', row);
-			return possibleMoves;
-		},
-		rookPushMove: function(array, target, possibleMoves, columOrRow, number){
-			for(var i = 0; i < array.length; i++){
-				if(arguments[3] === 'colum'){
-					var cell = '#' + array[i] + Board.colums[number];
-				}else{
-					var cell = '#' + number + array[i];
-				}
-				if(Game.checkType(target, cell) == null){
-					possibleMoves.push(cell);
-				}else if(Game.checkType(target, cell) == true){
-					possibleMoves.push(cell);
-					break;
-				}else{
-					break;
-				}
-			};
-		},
-		saveQueen: function(soldierPosition, queenPosition, enemyPosition) {
+			var n = Game.windRoseDirections(upRows, target, row, colum, 'y -y');
+			var s = Game.windRoseDirections(downRows, target, row, colum, 'y -y');
+			var w = Game.windRoseDirections(leftColums, target, row, colum, 'x -x');
+			var e = Game.windRoseDirections(rightColums, target, row, colum, 'x -x');
 
+			var directions = [n, s, e, w];
+
+			return directions;
 		}
 	},
 	knight: {
@@ -340,38 +382,32 @@ Soldiers = {
 			} else {
 				var target = $(event.target);
 			}
+			var possibleMoves = [];
+			var directions = this.windRose(target);
+			directions.forEach(function(entry) {
+				for (var i = 0; i < entry.length; i++) {
+					possibleMoves.push(entry[i]);
+				}
+			});
+			return possibleMoves;
+		},
+		windRose: function(field) {
+			var target = $(field);
 			var fieldData = target.attr('id').split('');
 			var row = Number(fieldData[0]);
 			var colum = Board.colums.indexOf(fieldData[1]);
-			var possibleMoves = [];
-			var upMoves = Board.rows.slice(0, $.inArray(row, Board.rows)).reverse();
-			var downMoves = Board.rows.slice($.inArray(row, Board.rows) + 1);
-			
-			this.bishopPushMove(upMoves, target, possibleMoves, row, colum, 'left');
-			this.bishopPushMove(upMoves, target, possibleMoves, row, colum, 'right');
-			this.bishopPushMove(downMoves, target, possibleMoves, row, colum, 'left');
-			this.bishopPushMove(downMoves, target, possibleMoves, row, colum, 'right');
-			return possibleMoves;
-		},
-		bishopPushMove: function(array, target, possibleMoves, row, colum, leftOrRight){
-			for(var i = 0; i < array.length; i++){
-				if(leftOrRight == 'left'){
-					$checkCol = Board.colums[colum - (Math.abs(row - array[i]))];
-				}else{
-					$checkCol = Board.colums[colum + (Math.abs(row - array[i]))];
-				}
-				if($checkCol !== undefined){
-					var cell= '#' + array[i] + $checkCol;
-					if(Game.checkType(target, cell) == null){
-						possibleMoves.push(cell);
-					}else if(Game.checkType(target, cell) == true){
-						possibleMoves.push(cell);
-						break;
-					}else{
-						break;
-					}
-				}
-			}
+			var upRows = Board.rows.slice(0, $.inArray(row, Board.rows)).reverse();
+			var downRows = Board.rows.slice($.inArray(row, Board.rows) + 1);
+			var leftColums = Board.colums.slice(0, colum).reverse();
+			var rightColums = Board.colums.slice(colum + 1);
+
+			var ne = Game.windRoseDirections(upRows, target, row, colum, 'y x');
+			var nw = Game.windRoseDirections(upRows, target, row, colum, 'y -x');
+			var se = Game.windRoseDirections(downRows, target, row, colum, 'y x');
+			var sw = Game.windRoseDirections(downRows, target, row, colum, 'y -x');
+
+			var directions = [ne, nw, se, sw];
+			return directions;
 		}
 	},
 	queen: {
@@ -430,30 +466,44 @@ Soldiers = {
 		name: 'king',
 		black: '&#9819',
 		white: '&#9813',
-			checkFields: function(event, field) {
+		checkFields: function(event, field) {
 			if (event === undefined) {
 				var target = field;
 				var target = $(target);
 			} else {
 				var target = $(event.target);
 			}
+			var possibleMoves = [];
+			var directions = this.windRose(target);
+			directions.forEach(function(entry) {
+				for (var i = 0; i < entry.length; i++) {
+					possibleMoves.push(entry[i]);
+				}
+			});
+			return possibleMoves;
+		},
+		windRose: function(field) {
+			var target = $(field);
 			var fieldData = target.attr('id').split('');
 			var row = Number(fieldData[0]);
 			var colum = Board.colums.indexOf(fieldData[1]);
-			var possibleMoves = [];
-			var upMoves = Board.rows.slice(0, $.inArray(row, Board.rows)).reverse();
-			var downMoves = Board.rows.slice($.inArray(row, Board.rows) + 1);
-			var leftMoves = Board.colums.slice(0, colum).reverse();
-			var rightMoves = Board.colums.slice(colum + 1);
-			Soldiers.rook.rookPushMove(upMoves, target, possibleMoves,'colum', colum);
-			Soldiers.rook.rookPushMove(downMoves, target, possibleMoves,'colum', colum);
-			Soldiers.rook.rookPushMove(leftMoves, target, possibleMoves,'row', row);
-			Soldiers.rook.rookPushMove(rightMoves, target, possibleMoves,'row',row);
-			Soldiers.bishop.bishopPushMove(upMoves, target, possibleMoves,row, colum, 'left');
-			Soldiers.bishop.bishopPushMove(upMoves, target, possibleMoves,row, colum, 'right');
-			Soldiers.bishop.bishopPushMove(downMoves, target, possibleMoves,row, colum, 'left');
-			Soldiers.bishop.bishopPushMove(downMoves, target, possibleMoves,row, colum, 'right');
-			return possibleMoves;
+			var upRows = Board.rows.slice(0, $.inArray(row, Board.rows)).reverse();
+			var downRows = Board.rows.slice($.inArray(row, Board.rows) + 1);
+			var leftColums = Board.colums.slice(0, colum).reverse();
+			var rightColums = Board.colums.slice(colum + 1);
+
+			var ne = Game.windRoseDirections(upRows, target, row, colum, 'y x');
+			var nw = Game.windRoseDirections(upRows, target, row, colum, 'y -x');
+			var se = Game.windRoseDirections(downRows, target, row, colum, 'y x');
+			var sw = Game.windRoseDirections(downRows, target, row, colum, 'y -x');
+
+			var n = Game.windRoseDirections(upRows, target, row, colum, 'y -y');
+			var s = Game.windRoseDirections(downRows, target, row, colum, 'y -y');
+			var w = Game.windRoseDirections(leftColums, target, row, colum, 'x -x');
+			var e = Game.windRoseDirections(rightColums, target, row, colum, 'x -x');
+
+			var directions = [n, s, e, w];
+			return directions;
 		}
 	},
 	pawn: {
