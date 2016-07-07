@@ -211,10 +211,10 @@ Game = {
 		return moves;
 	},
 	checkmate: function(enemies, friends) {
-		queenKillers = [];
-		queenHelpers = [];
-		queen = undefined;
-		// Enemies
+		var queenKillers = [];
+		var queenHelpers = [];
+		var queen = undefined;
+		// Enemies, check if some one can kill the queen
 		for( var i = 0; i < enemies.length; i++) {
 			var enemyFigure = $('#' + enemies[i].id).attr('name');
 			var enemyFieldData = document.getElementById(enemies[i].id);
@@ -226,8 +226,8 @@ Game = {
 				}
 			}); 
 		}
+		// Friends, if there are queenKiller, check can some friend help
 		if (queenKillers.length > 0) {
-			// Friends
 			for( var i = 0; i < friends.length; i++) {
 				var friendFigure = $('#' + friends[i].id).attr('name');
 				var friendFieldData = document.getElementById(friends[i].id);
@@ -241,45 +241,68 @@ Game = {
 				}); 
 			}
 		}
-		// Check if queen can move
-		if (queen != undefined) {
+		// if no one can help check can queen move
+		if (queen !== undefined && queenHelpers.length === 0) {
 			var queenTarget = document.getElementById($(queen).attr('id'));
 			var queenMoves = Soldiers[$(queen).attr('name')].checkFields(undefined, queenTarget);
-			if (queenMoves.length > 0) {
+		}
+		// if queen can move, creat an array with all enemie moves and check is there escape
+		if (queen !== undefined && queenMoves.length > 0) {
 
-				// <------------------------------------------------->
+			var queenEscape = undefined;
+			var enemiesTotalMoves = [];
 
-				// Artiq uzun mesafeden queene mat vere bilecek figurlar ucun windRose funksiyasi var, ve onlarin gedishleri 
-				// 4 (North, West, South, East) ve ya 8 (N, W, E, S, NW, NE, SW, SE ve s) hisseye bolunur, belelikle queen tehlukede olanda 
-				// asanliqla mueyyenleshdirmerk olar ki tehluke hansi terefden gelir ve onun qarshisini ala bilecek dost varmi. 
-				// Hal hazirda yazilasi kod budu: Eger queen hereket ede bilirse onceden mueyyenleshdirmek lazimdi ki belke onun 
-				// hereket zonasi ele onu vuracaq figurun/figurlarin gedish zonasindadi. Eger hele deyilse queen 
-				// tehlukesiz yere hereket ede bilirse demeli shax ve mat deyil. Yox eger beledirse, baxmaq lazimdi ona tehluke 
-				// yaradan figuru (yalniz 1 figurdan tehluke geldiyi halda) vura bilecek dost varmi, eger helesi de yoxdursa baxmaq lazimdi 
-				// en azindan dushman figurnan queen arasindaki tehluke zonasina dost hereket edib queeni block ede bilermi. Eger butun bunlar
-				// deyilse demeli shax ve matdi. 
-
-				// <------------------------------------------------->
-
+			for (var i = 0; i < enemies.length; i++) {
+				var enemyFigure = $('#' + enemies[i].id).attr('name');
+				var enemyFieldData = document.getElementById(enemies[i].id);
+				enemyFigureMoves = Soldiers[enemyFigure].checkFields(undefined, enemyFieldData);
+				enemiesTotalMoves = enemiesTotalMoves.concat(enemyFigureMoves);
 			}
-			// if queen cant move and where are no queenHelpers
-			if (queenMoves.length === 0 && queenHelpers.length === 0) {
-				for (var i = 0; i < queenKillers.length; i++) {
-					var queenKillerTarget = document.getElementById($(queenKillers[i]).attr('id'));
-					var killerName = $(queenKillers[i]).attr('name');
-					var directions = Soldiers[killerName].windRose(queenKillerTarget);
-					var terra = undefined;
-					for (var i = 0; i < directions.length; i++) {
-						for (var x = 0; x < directions[i].length; x++) {
-							var queenIndex = directions[i].indexOf('#' + $(queen).attr('id'));
-							if (queenIndex >= 0) {
-								terra = i;
-							}
+			for (var i = 0; i < queenMoves.length; i++) {
+				queenEscape = enemiesTotalMoves.indexOf(queenMoves[i]);
+				if (queenEscape < 0) {
+					queenEscape = true;
+					break;
+				}
+			}
+		}
+		// if there are no escape for queen, check can some friend block the queen
+		if (queenEscape === undefined) {
+			for (var i = 0; i < queenKillers.length; i++) {
+				var queenKillerTarget = document.getElementById($(queenKillers[i]).attr('id'));
+				var killerName = $(queenKillers[i]).attr('name');
+				var directions = Soldiers[killerName].windRose(queenKillerTarget);
+				var terra = undefined;
+				for (var i = 0; i < directions.length; i++) {
+					for (var x = 0; x < directions[i].length; x++) {
+						var queenIndex = directions[i].indexOf('#' + $(queen).attr('id'));
+						if (queenIndex >= 0) {
+							terra = i;
 						}
 					}
 				}
 			}
+			console.log(queenEscape);
 		}
+
+		//	// if queen cant move and where are no queenHelpers
+		//	if (queenMoves.length === 0 && queenHelpers.length === 0) {
+		//		for (var i = 0; i < queenKillers.length; i++) {
+		//			var queenKillerTarget = document.getElementById($(queenKillers[i]).attr('id'));
+		//			var killerName = $(queenKillers[i]).attr('name');
+		//			var directions = Soldiers[killerName].windRose(queenKillerTarget);
+		//			var terra = undefined;
+		//			for (var i = 0; i < directions.length; i++) {
+		//				for (var x = 0; x < directions[i].length; x++) {
+		//					var queenIndex = directions[i].indexOf('#' + $(queen).attr('id'));
+		//					if (queenIndex >= 0) {
+		//						terra = i;
+		//					}
+		//				}
+		//			}
+		//		}
+		//	}
+		// }
 	},
 	allSoldiers: function(side, rel) {
 		if (rel === 'friend') {
