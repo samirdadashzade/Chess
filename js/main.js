@@ -140,9 +140,6 @@ Board = {
 			default:
 			break;
 		}
-		if (directions) {
-			console.log(directions);
-		}
 	}
 }
 
@@ -211,9 +208,13 @@ Game = {
 		return moves;
 	},
 	checkmate: function(enemies, friends) {
+		// function data
 		var queenKillers = [];
-		var queenHelpers = [];
 		var queen = undefined;
+		var queenEscape = undefined;
+		var queenMoves = undefined;
+		var checkmate = false;
+
 		// Enemies, check if some one can kill the queen
 		for( var i = 0; i < enemies.length; i++) {
 			var enemyFigure = $('#' + enemies[i].id).attr('name');
@@ -223,11 +224,13 @@ Game = {
 				if ($(entry).attr('name') === 'queen' && $(entry).attr('data-side') != $('#' + enemies[i].id).attr('data-side')) {
 					queenKillers.push(enemies[i]);
 					queen = $(entry);
+					console.log('Dangar detected');
 				}
 			}); 
 		}
 		// Friends, if there are queenKiller, check can some friend help
 		if (queenKillers.length > 0) {
+			
 			for( var i = 0; i < friends.length; i++) {
 				var friendFigure = $('#' + friends[i].id).attr('name');
 				var friendFieldData = document.getElementById(friends[i].id);
@@ -235,74 +238,77 @@ Game = {
 				friendFigureMoves.forEach(function(entry){
 					for (var x = 0; x < queenKillers.length; x++) {
 						if (entry === ('#' + $(queenKillers[x]).attr('id'))) {
-							queenHelpers.push(friends[i]);
+							queenKillers.splice(x, 1);
+							console.log('Someone can help');
 						}
 					}
 				}); 
 			}
-		}
-		// if no one can help check can queen move
-		if (queen !== undefined && queenHelpers.length === 0) {
-			var queenTarget = document.getElementById($(queen).attr('id'));
-			var queenMoves = Soldiers[$(queen).attr('name')].checkFields(undefined, queenTarget);
-		}
-		// if queen can move, creat an array with all enemie moves and check is there escape
-		if (queen !== undefined && queenMoves.length > 0) {
 
-			var queenEscape = undefined;
-			var enemiesTotalMoves = [];
+			// if no one can help check can queen move
+			if (queen !== undefined && queenKillers.length > 0) {
 
-			for (var i = 0; i < enemies.length; i++) {
-				var enemyFigure = $('#' + enemies[i].id).attr('name');
-				var enemyFieldData = document.getElementById(enemies[i].id);
-				enemyFigureMoves = Soldiers[enemyFigure].checkFields(undefined, enemyFieldData);
-				enemiesTotalMoves = enemiesTotalMoves.concat(enemyFigureMoves);
-			}
-			for (var i = 0; i < queenMoves.length; i++) {
-				queenEscape = enemiesTotalMoves.indexOf(queenMoves[i]);
-				if (queenEscape < 0) {
-					queenEscape = true;
-					break;
+				var queenTarget = document.getElementById($(queen).attr('id'));
+				queenMoves = Soldiers[$(queen).attr('name')].checkFields(undefined, queenTarget);
+
+				// if queen can move, creat an array with all enemie moves and check is there escape
+				if (queen !== undefined && queenMoves.length > 0) {
+
+					var enemiesTotalMoves = [];
+
+					for (var i = 0; i < enemies.length; i++) {
+						var enemyFigure = $('#' + enemies[i].id).attr('name');
+						var enemyFieldData = document.getElementById(enemies[i].id);
+						enemyFigureMoves = Soldiers[enemyFigure].checkFields(undefined, enemyFieldData);
+						enemiesTotalMoves = enemiesTotalMoves.concat(enemyFigureMoves);
+					}
+					for (var i = 0; i < queenMoves.length; i++) {
+						queenEscape = enemiesTotalMoves.indexOf(queenMoves[i]);
+						if (queenEscape < 0) {
+							queenEscape = true;
+							console.log('Queen can escape ' + queenEscape);
+							break;
+						}
+					}
 				}
-			}
-		}
-		// if there are no escape for queen, check can some friend block the queen
-		if (queenEscape === undefined) {
-			for (var i = 0; i < queenKillers.length; i++) {
-				var queenKillerTarget = document.getElementById($(queenKillers[i]).attr('id'));
-				var killerName = $(queenKillers[i]).attr('name');
-				var directions = Soldiers[killerName].windRose(queenKillerTarget);
-				var terra = undefined;
-				for (var i = 0; i < directions.length; i++) {
-					for (var x = 0; x < directions[i].length; x++) {
-						var queenIndex = directions[i].indexOf('#' + $(queen).attr('id'));
-						if (queenIndex >= 0) {
-							terra = i;
+
+				// if queenKiller is knight and there are no figure for help and queenEscape = false, than it is chackmate
+				if (queen !== undefined && queenEscape !== true && queenKillers.length > 0) {
+					for (var i = 0; i < queenKillers.length; i++) {
+						var killerName = $(queenKillers[i]).attr('name');
+						var windRose = undefined;
+						if (killerName === 'knight') {
+							checkmate = true;
+						}
+					}
+				}
+
+				// if checkmate is still false check can some friend block the queen
+				if (checkmate !== true && queen !== undefined && queenEscape !== true && queenKillers.length > 0) {
+					for (var i = 0; i < queenKillers.length; i++) {
+						var queenKillerTarget = document.getElementById($(queenKillers[i]).attr('id'));
+						var killerName = $(queenKillers[i]).attr('name');
+						if (killerName === 'bishop' || killerName === 'king' || killerName === 'rook') {
+							var directions = Soldiers[killerName].windRose(queenKillerTarget);
+							var terra = undefined;
+							for (var i = 0; i < directions.length; i++) {
+								for (var x = 0; x < directions[i].length; x++) {
+									var queenIndex = directions[i].indexOf('#' + $(queen).attr('id'));
+									if (queenIndex >= 0) {
+										terra = i;
+									}
+								}
+							}
 						}
 					}
 				}
 			}
-			console.log(queenEscape);
 		}
 
-		//	// if queen cant move and where are no queenHelpers
-		//	if (queenMoves.length === 0 && queenHelpers.length === 0) {
-		//		for (var i = 0; i < queenKillers.length; i++) {
-		//			var queenKillerTarget = document.getElementById($(queenKillers[i]).attr('id'));
-		//			var killerName = $(queenKillers[i]).attr('name');
-		//			var directions = Soldiers[killerName].windRose(queenKillerTarget);
-		//			var terra = undefined;
-		//			for (var i = 0; i < directions.length; i++) {
-		//				for (var x = 0; x < directions[i].length; x++) {
-		//					var queenIndex = directions[i].indexOf('#' + $(queen).attr('id'));
-		//					if (queenIndex >= 0) {
-		//						terra = i;
-		//					}
-		//				}
-		//			}
-		//		}
-		//	}
-		// }
+		if (checkmate === true) {
+			alert('This is chackmate!');
+		}
+
 	},
 	allSoldiers: function(side, rel) {
 		if (rel === 'friend') {
@@ -555,7 +561,7 @@ Soldiers = {
 			var w = Game.windRoseDirections(leftColums, target, row, colum, 'x -x');
 			var e = Game.windRoseDirections(rightColums, target, row, colum, 'x -x');
 
-			var directions = [n, s, e, w];
+			var directions = [n, s, e, w, ne, nw, se, sw];
 			return directions;
 		}
 	},
