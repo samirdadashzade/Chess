@@ -230,7 +230,7 @@ Game = {
 		}
 		// Friends, if there are queenKiller, check can some friend help
 		if (queenKillers.length > 0) {
-			
+
 			for( var i = 0; i < friends.length; i++) {
 				var friendFigure = $('#' + friends[i].id).attr('name');
 				var friendFieldData = document.getElementById(friends[i].id);
@@ -298,6 +298,9 @@ Game = {
 										terra = i;
 									}
 								}
+							}
+							if (terra !== undefined) {
+								
 							}
 						}
 					}
