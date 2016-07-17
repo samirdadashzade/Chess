@@ -76,13 +76,14 @@ body {
 }
 .darks {
 	float: left;
+	margin-left: -30px;
 	/*border: 1px solid black;*/
 	text-align: center;
 	height: 50px;
 }
 .lights {
 	float: right;
-	margin-right: 30px;
+	margin-right: 10px;
 	/*border: 1px solid black;*/
 	text-align: center;
 	height: 50px;
