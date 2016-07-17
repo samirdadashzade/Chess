@@ -1,32 +1,32 @@
 CheckMatePositions = {
-  cornerMate: function() {
+    cornerMate: function() {
 
-    $('#8h').attr('name', Soldiers.queen.name).attr('data-side', 'dark').html(Soldiers.queen.black);
-    $('#7h').attr('name', Soldiers.pawn.name).attr('data-side', 'dark').attr('data-firstMove', 0).html(Soldiers.pawn.black);
+        $('#8h').attr('name', Soldiers.queen.name).attr('data-side', 'dark').html(Soldiers.queen.black);
+        $('#7h').attr('name', Soldiers.pawn.name).attr('data-side', 'dark').attr('data-firstMove', 0).html(Soldiers.pawn.black);
 
-    $('#6h').attr('name', Soldiers.knight.name).attr('data-side', 'light').html(Soldiers.knight.white);
-    $('#1g').attr('name', Soldiers.rook.name).attr('data-side', 'light').html(Soldiers.rook.white);
-  },
-  doubleBishopMate: function() {
-    $('#8h').attr('name', Soldiers.queen.name).attr('data-side', 'dark').html(Soldiers.queen.black);
-    $('#7h').attr('name', Soldiers.pawn.name).attr('data-side', 'dark').attr('data-firstMove', 0).html(Soldiers.pawn.black);
-    $('#8g').attr('name', Soldiers.pawn.name).attr('data-side', 'dark').attr('data-firstMove', 0).html(Soldiers.pawn.black);
+        $('#6h').attr('name', Soldiers.knight.name).attr('data-side', 'light').html(Soldiers.knight.white);
+        $('#1g').attr('name', Soldiers.rook.name).attr('data-side', 'light').html(Soldiers.rook.white);
+    },
+    doubleBishopMate: function() {
+        $('#8h').attr('name', Soldiers.queen.name).attr('data-side', 'dark').html(Soldiers.queen.black);
+        $('#7h').attr('name', Soldiers.pawn.name).attr('data-side', 'dark').attr('data-firstMove', 0).html(Soldiers.pawn.black);
+        $('#8g').attr('name', Soldiers.pawn.name).attr('data-side', 'dark').attr('data-firstMove', 0).html(Soldiers.pawn.black);
 
 
-    $('#5d').attr('name', Soldiers.bishop.name).attr('data-side', 'light').html(Soldiers.bishop.white);
-    $('#4b').attr('name', Soldiers.king.name).attr('data-side', 'light').html(Soldiers.king.white);
-  },
-  doubleRookMate: function() {
-    $('#8h').attr('name', Soldiers.queen.name).attr('data-side', 'dark').html(Soldiers.queen.black);
-    $('#7h').attr('name', Soldiers.pawn.name).attr('data-side', 'dark').attr('data-firstMove', 0).html(Soldiers.pawn.black);
-    $('#7g').attr('name', Soldiers.knight.name).attr('data-side', 'dark').attr('data-firstMove', 0).html(Soldiers.knight.black);
+        $('#5d').attr('name', Soldiers.bishop.name).attr('data-side', 'light').html(Soldiers.bishop.white);
+        $('#4b').attr('name', Soldiers.king.name).attr('data-side', 'light').html(Soldiers.king.white);
+    },
+    doubleRookMate: function() {
+        $('#8h').attr('name', Soldiers.queen.name).attr('data-side', 'dark').html(Soldiers.queen.black);
+        $('#7h').attr('name', Soldiers.pawn.name).attr('data-side', 'dark').attr('data-firstMove', 0).html(Soldiers.pawn.black);
+        $('#7g').attr('name', Soldiers.pawn.name).attr('data-side', 'dark').attr('data-firstMove', 0).html(Soldiers.pawn.black);
+        $('#7f').attr('name', Soldiers.bishop.name).attr('data-side', 'dark').attr('data-firstMove', 0).html(Soldiers.bishop.black);
 
-    $('#7b').attr('name', Soldiers.rook.name).attr('data-side', 'light').html(Soldiers.rook.white);
-    $('#6a').attr('name', Soldiers.rook.name).attr('data-side', 'light').html(Soldiers.rook.white);
-  }
+        // $('#7b').attr('name', Soldiers.rook.name).attr('data-side', 'light').html(Soldiers.rook.white);
+        $('#6a').attr('name', Soldiers.rook.name).attr('data-side', 'light').html(Soldiers.rook.white);
+        $('#1a').attr('name', Soldiers.bishop.name).attr('data-side', 'light').html(Soldiers.bishop.white);
+    }
 }
-
-
 
 // Board object
 Board = {
@@ -335,32 +335,32 @@ Game = {
                                 }
                             }
                             if (terra !== undefined) {
-                              for (var m = 0; m < friends.length; m++) {
-                                  var friendFigure = $('#' + friends[m].id).attr('name');
-                                  var friendFieldData = document.getElementById(friends[m].id);
-                                  friendFigureMoves = Soldiers[friendFigure].checkFields(undefined, friendFieldData);
-                                  friendFigureMoves.forEach(function(entry) {
-                                    if ($(queenKillers[i]).attr('id') !== undefined) {
-                                      var kilelrFieldDate = document.getElementById($(queenKillers[i]).attr('id'));
-                                      var killerDirections = Soldiers[killerName].windRose(kilelrFieldDate);
-                                      killerDirections = killerDirections[terra];
-                                      for (z = 0; z < killerDirections.length; z++) {
-                                        if (entry === killerDirections[z] && $(entry).attr('name') !== 'queen') {
-                                          queenKillers.splice(x, 1);
-                                          console.log('some one can block the queen');
-                                          console.log(queenKillers.length);
+                                for (var m = 0; m < friends.length; m++) {
+                                    var friendFigure = $('#' + friends[m].id).attr('name');
+                                    var friendFieldData = document.getElementById(friends[m].id);
+                                    friendFigureMoves = Soldiers[friendFigure].checkFields(undefined, friendFieldData);
+                                    friendFigureMoves.forEach(function(entry) {
+                                        if ($(queenKillers[i]).attr('id') !== undefined) {
+                                            var kilelrFieldDate = document.getElementById($(queenKillers[i]).attr('id'));
+                                            var killerDirections = Soldiers[killerName].windRose(kilelrFieldDate);
+                                            killerDirections = killerDirections[terra];
+                                            for (z = 0; z < killerDirections.length; z++) {
+                                                if (entry === killerDirections[z] && $('#' + friends[m].id).attr('name') !== 'queen' && $(entry).attr('name') !== 'queen') {
+                                                    queenKillers.splice(x, 1);
+                                                }
+                                            }
                                         }
-                                      }
-                                    }
-                                });
-                              }
+                                    });
+                                }
                             }
                         }
                     }
                 }
             }
         }
-
+        if (queenKillers.length > 0) {
+          checkmate = true;
+        }
         if (checkmate === true) {
             alert('This is chackmate!');
         }
@@ -767,6 +767,7 @@ Soldiers = {
                 var enemies = Game.allSoldiers($('#' + target.id).attr('data-side'), 'friend');
                 var friends = Game.allSoldiers($('#' + target.id).attr('data-side'), 'enemy');
                 Game.checkmate(enemies, friends);
+                Game.checkmate(friends, enemies);
             } else if (activeFigure.length > 0 && $(target).html().length !== 0 && $(target).attr('data-side') !== activeFigure.attr('data-side') && moves.indexOf('#' + target.id) > -1) {
 
                 if ($(target).attr('data-side') === 'dark') {
@@ -779,6 +780,7 @@ Soldiers = {
                 var enemies = Game.allSoldiers($('#' + target.id).attr('data-side'), 'friend');
                 var friends = Game.allSoldiers($('#' + target.id).attr('data-side'), 'enemy');
                 Game.checkmate(enemies, friends);
+                Game.checkmate(friends, enemies);
 
             }
         });
@@ -789,10 +791,9 @@ $(document).ready(function() {
 
     Board.createDesk();
     Board.createSideBar();
-    // Soldiers.createSoldiers();
-
+    Soldiers.createSoldiers();
     // CheckMatePositions.doubleBishopMate();
-    CheckMatePositions.doubleRookMate();
+    // CheckMatePositions.doubleRookMate();
 
     Soldiers.selectSoldier();
     Soldiers.move();
