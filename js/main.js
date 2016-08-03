@@ -149,11 +149,10 @@ Board = {
         $(target).addClass('active');
         activeCounter = 1;
         var figure = $(target).attr('name');
-        if (figure === 'rook') {
-            moves = Soldiers[figure].checkFields(event, undefined);
-        } else {
-            moves = Soldiers[figure].checkFields(event, undefined);
-        }
+        moves = Soldiers[figure].checkFields(event, undefined);
+        // if (figure === 'queen') {
+        	
+        // }
         for (var i = 0; i < moves.length; i++) {
             $(moves[i]).addClass('possibleMove');
         }
@@ -574,6 +573,28 @@ Soldiers = {
                     possibleMoves.push(cell);
                 }
             }
+
+            //check if which queen is clicked and if it's its first move
+            if(target.attr('data-firstmove')==0 && target.attr('data-side')==='light'){
+            	//check if there is something on its right sides till rook
+            	if($('#1f').html()=='' && $('#1g').html()=='' && $('#1h').attr('data-firstmove')==0){
+            		possibleMoves.push('#1g');
+            	}	
+            	//check if there is something on its left sides till rook
+            	if($('#1d').html()=='' && $('#1c').html()=='' && $('#1b').html()=='' && $('#1a').attr('data-firstmove')==0){
+            		possibleMoves.push('#1c');
+            	}
+
+            }else if(target.attr('data-firstmove')==0 && target.attr('data-side')==='dark'){
+            	//check if there is something on its right sides till rook
+            	if($('#8f').html()=='' && $('#8g').html()=='' && $('#8h').attr('data-firstmove')==0){
+            		possibleMoves.push('#8g');
+            	}	
+            	//check if there is something on its left sides till rook
+            	if($('#8d').html()=='' && $('#8c').html()=='' && $('#8b').html()=='' && $('#8a').attr('data-firstmove')==0){
+            		possibleMoves.push('#8c');
+            	}
+            }
             return possibleMoves;
         }
     },
@@ -706,26 +727,26 @@ Soldiers = {
         }
     },
     createSoldiers: function() {
-        $('#8a').attr('name', this.rook.name).attr('data-side', 'dark').html(this.rook.black);
+        $('#8a').attr('name', this.rook.name).attr({'data-side' : 'dark', 'data-firstMove' : 0}).html(this.rook.black);
         $('#8b').attr('name', this.knight.name).attr('data-side', 'dark').html(this.knight.black);
         $('#8c').attr('name', this.bishop.name).attr('data-side', 'dark').html(this.bishop.black);
         $('#8d').attr('name', this.king.name).attr('data-side', 'dark').html(this.king.black);
-        $('#8e').attr('name', this.queen.name).attr('data-side', 'dark').html(this.queen.black);
+        $('#8e').attr('name', this.queen.name).attr({'data-side' : 'dark', 'data-firstMove' : 0}).html(this.queen.black);
         $('#8f').attr('name', this.bishop.name).attr('data-side', 'dark').html(this.bishop.black);
         $('#8g').attr('name', this.knight.name).attr('data-side', 'dark').html(this.knight.black);
-        $('#8h').attr('name', this.rook.name).attr('data-side', 'dark').html(this.rook.black);
+        $('#8h').attr('name', this.rook.name).attr({'data-side' : 'dark', 'data-firstMove' : 0}).html(this.rook.black);
         for (var i = 0; i < Board.colums.length; i++) {
             $('#7' + Board.colums[i]).attr('name', this.pawn.name).attr('data-side', 'dark').attr('data-firstMove', 0).html(this.pawn.black);
         }
 
-        $('#1a').attr('name', this.rook.name).attr('data-side', 'light').html(this.rook.white);
+        $('#1a').attr('name', this.rook.name).attr({'data-side' : 'light', 'data-firstMove' : 0}).html(this.rook.white);
         $('#1b').attr('name', this.knight.name).attr('data-side', 'light').html(this.knight.white);
         $('#1c').attr('name', this.bishop.name).attr('data-side', 'light').html(this.bishop.white);
         $('#1d').attr('name', this.king.name).attr('data-side', 'light').html(this.king.white);
-        $('#1e').attr('name', this.queen.name).attr('data-side', 'light').html(this.queen.white);
+        $('#1e').attr('name', this.queen.name).attr({'data-side' : 'light', 'data-firstMove' : 0}).html(this.queen.white);
         $('#1f').attr('name', this.bishop.name).attr('data-side', 'light').html(this.bishop.white);
         $('#1g').attr('name', this.knight.name).attr('data-side', 'light').html(this.knight.white);
-        $('#1h').attr('name', this.rook.name).attr('data-side', 'light').html(this.rook.white);
+        $('#1h').attr('name', this.rook.name).attr({'data-side' : 'light', 'data-firstMove' : 0}).html(this.rook.white);
         for (var i = 0; i < Board.colums.length; i++) {
             $('#2' + Board.colums[i]).attr('name', this.pawn.name).attr('data-side', 'light').attr('data-firstMove', 0).html(this.pawn.white);
         }
@@ -762,6 +783,29 @@ Soldiers = {
             var activeFigure = $('#chessDesk').find('[data="active"]');
 
             if (activeFigure.length > 0 && clickCounter === 1 && $(target).html().length === 0 && moves.indexOf('#' + target.id) > -1) {
+            	//castling
+            	if(activeFigure.attr('name')=='queen'){
+            		var currentQueenPos = activeFigure.attr('id').split('');
+		            var currentQueenColum = Board.colums.indexOf(currentQueenPos[1]);
+		            var currentQueenRow = currentQueenPos[0];
+
+		            var nextQueenPos = $(target).attr('id').split('');
+		            var nextQueenColum = Board.colums.indexOf(nextQueenPos[1]);
+
+		            if(Math.abs(currentQueenColum - nextQueenColum)==2){
+		            	if(currentQueenColum - nextQueenColum == -2){
+			            	// right castling
+			            	var rookTarget=$('#chessDesk').find('#' + currentQueenRow + Board.colums[currentQueenColum+1])[0];
+			            	var rookActive=$('#chessDesk').find('#' + currentQueenRow + Board.colums[7]);
+			            }else if(currentQueenColum - nextQueenColum == 2){
+			            	// left castling
+			            	var rookTarget=$('#chessDesk').find('#' + currentQueenRow + Board.colums[currentQueenColum-1])[0];
+			            	var rookActive=$('#chessDesk').find('#' + currentQueenRow + Board.colums[0]);
+			            }
+			            Board.rewriteField(rookTarget, rookActive);
+	            		Board.turn++;
+		            }            		
+            	}
 
                 Board.rewriteField(target, activeFigure);
                 var enemies = Game.allSoldiers($('#' + target.id).attr('data-side'), 'friend');
